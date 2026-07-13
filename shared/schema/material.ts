@@ -10,7 +10,10 @@ export const layoutSchema = z.object({
 
 export const materialTypeSchema = z.enum([
   'text',
-  'charts',
+  'area-chart',
+  'bar-chart',
+  'line-chart',
+  'pie-chart',
 ])
 
 export const materialGroupSchema = z.enum([
