@@ -49,7 +49,7 @@ export function getMaterialComponent(type: MaterialType) {
   return componentMap.get(type)
 }
 
-export function createNode(node: MaterialDefinition['schema']): Material {
+export function createMaterialNode(node: MaterialDefinition['schema']): Material {
   return {
     ...node,
     id: crypto.randomUUID(),

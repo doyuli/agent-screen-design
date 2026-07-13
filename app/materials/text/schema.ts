@@ -9,6 +9,7 @@ export const textMaterialSchema: MaterialDefinition = {
     type: 'text',
     name: '普通文本',
     description: '基础',
+    locked: false,
     layout: {
       x: 0,
       y: 0,

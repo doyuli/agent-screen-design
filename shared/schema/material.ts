@@ -22,6 +22,7 @@ export const materialSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
+  locked: z.boolean().optional(),
   type: materialTypeSchema,
   layout: layoutSchema,
   style: z.record(z.string(), z.unknown()).optional(),

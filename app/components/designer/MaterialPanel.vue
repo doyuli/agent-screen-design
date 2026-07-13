@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MaterialGroup } from '~~/shared/schema/material'
+import type { MaterialDefinition, MaterialGroup } from '~~/shared/schema/material'
 import { ref } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -9,10 +9,15 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
+import { DATA_TRANSFER_KEY } from '~/constants'
 import { getAllMaterials, getMaterialGroups, getMaterialsByGroup } from '~/materials'
 
 const materialGroups = getMaterialGroups()
 const activeGroup = ref<MaterialGroup>(materialGroups[0]?.key ?? 'basics')
+
+function onDragStart(schema: MaterialDefinition['schema'], e: DragEvent) {
+  e.dataTransfer?.setData(DATA_TRANSFER_KEY, JSON.stringify(schema))
+}
 </script>
 
 <template>
@@ -48,6 +53,8 @@ const activeGroup = ref<MaterialGroup>(materialGroups[0]?.key ?? 'basics')
               :key="material.schema.type"
               variant="outline"
               class="h-22 flex-col items-stretch justify-between rounded-md border-border bg-background p-2.5 text-left shadow-none hover:bg-background/10"
+              draggable="true"
+              @dragstart="onDragStart(material.schema, $event)"
             >
               <span class="flex size-7 items-center justify-center rounded-md bg-muted text-muted-foreground">
                 <component :is="material.icon" class="size-4" aria-hidden="true" />
