@@ -18,7 +18,8 @@ export function useMoveable(
     e.target.style.left = `${e.left}px`
     e.target.style.top = `${e.top}px`
 
-    const node = nodes.value.find(node => node.id === e.target.id)
+    const id = e.target.getAttribute('data-node-id')
+    const node = nodes.value.find(node => node.id === id)
     if (node) {
       node.layout.x = e.left
       node.layout.y = e.top
@@ -29,7 +30,8 @@ export function useMoveable(
     e.target.style.width = `${e.width}px`
     e.target.style.height = `${e.height}px`
 
-    const node = nodes.value.find(node => node.id === e.target.id)
+    const id = e.target.getAttribute('data-node-id')
+    const node = nodes.value.find(node => node.id === id)
     if (node) {
       node.layout.width = e.width
       node.layout.height = e.height

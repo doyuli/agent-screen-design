@@ -20,6 +20,7 @@ const {
   rectHeight,
   lines,
   scale,
+  rulerGuidelines,
   palette,
   onZoomChange,
 } = useCanvasRuler({ canvasRootRef: canvasRoot, moveableRef })
@@ -107,6 +108,13 @@ watch(
         :draggable="true"
         :resizable="true"
         :origin="false"
+        :snappable="true"
+        :snap-container="canvasRoot"
+        :horizontal-guidelines="rulerGuidelines.horizontal"
+        :vertical-guidelines="rulerGuidelines.vertical"
+        :snap-horizontal-threshold="5"
+        :snap-vertical-threshold="5"
+        :zoom="scale"
         @drag="onDrag"
         @resize="onResize"
         @drag-group="onDragGroup"

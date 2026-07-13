@@ -7,6 +7,13 @@ interface UseCanvasRulerOptions {
   moveableRef: { value: Moveable | null }
 }
 
+interface RulerZoomChange {
+  scale: number
+  dimsOut?: {
+    elem: Pick<DOMRect, 'left' | 'top'>
+  }
+}
+
 export function useCanvasRuler({ canvasRootRef, moveableRef }: UseCanvasRulerOptions) {
   const canvas = ref({
     width: 1920,
@@ -24,6 +31,11 @@ export function useCanvasRuler({ canvasRootRef, moveableRef }: UseCanvasRulerOpt
   const rectWidth = ref(0)
   const rectHeight = ref(0)
   const scale = ref(1)
+  const canvasTransform = ref({ x: 0, y: 0 })
+  const rulerGuidelines = computed(() => ({
+    horizontal: lines.value.h.map(y => canvasTransform.value.y + y * scale.value),
+    vertical: lines.value.v.map(x => canvasTransform.value.x + x * scale.value),
+  }))
   const palette = {
     bgColor: 'transparent',
     longfgColor: '#94a3b8',
@@ -63,7 +75,15 @@ export function useCanvasRuler({ canvasRootRef, moveableRef }: UseCanvasRulerOpt
 
   onUnmounted(() => observer?.disconnect())
 
-  function onZoomChange() {
+  function onZoomChange({ dimsOut }: RulerZoomChange) {
+    const rootRect = canvasRootRef.value?.getBoundingClientRect()
+    if (rootRect && dimsOut) {
+      canvasTransform.value = {
+        x: dimsOut.elem.left - rootRect.left,
+        y: dimsOut.elem.top - rootRect.top,
+      }
+    }
+
     moveableRef.value?.updateRect()
   }
 
@@ -76,6 +96,7 @@ export function useCanvasRuler({ canvasRootRef, moveableRef }: UseCanvasRulerOpt
     rectHeight,
     lines,
     scale,
+    rulerGuidelines,
     palette,
     onZoomChange,
   }
