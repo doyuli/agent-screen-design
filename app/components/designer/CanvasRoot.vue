@@ -75,7 +75,7 @@ watch(
 
 <template>
   <section class="relative min-w-0 overflow-hidden bg-muted/40">
-    <div ref="canvasRoot" class="canvas-root">
+    <div ref="canvasRoot" class="relative h-full overflow-hidden isolate">
       <SketchRuler
         v-if="rectWidth > 0 && rectHeight > 0"
         v-model:scale="scale"
@@ -88,13 +88,13 @@ watch(
         :palette="palette"
         @zoomchange="onZoomChange"
       >
-        <div ref="stage" data-type="page" class="canvas-stage" :style="canvasStyle" @dragover.prevent @drop="onDrop">
+        <div ref="stage" class="relative" :style="canvasStyle" @dragover.prevent @drop="onDrop">
           <div
             v-for="(node, index) in nodes"
             :key="node.id"
             :data-node-id="node.id"
             :data-node-locked="node.locked"
-            class="canvas-node"
+            class="absolute"
             :style="getNodeStyle(node, index)"
             @mousedown="onSelect(node, $event)"
           >
@@ -123,20 +123,3 @@ watch(
     </div>
   </section>
 </template>
-
-<style scoped>
-.canvas-root {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.canvas-stage {
-  position: relative;
-}
-
-.canvas-node {
-  position: absolute;
-}
-</style>
