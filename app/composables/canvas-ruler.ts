@@ -1,11 +1,13 @@
+import type Moveable from 'vue3-moveable'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 interface UseCanvasRulerOptions {
   canvasRootRef: { value: HTMLElement | null }
+  moveableRef: { value: Moveable | null }
 }
 
-export function useCanvasRuler({ canvasRootRef }: UseCanvasRulerOptions) {
+export function useCanvasRuler({ canvasRootRef, moveableRef }: UseCanvasRulerOptions) {
   const canvas = ref({
     width: 1920,
     height: 1080,
@@ -61,7 +63,9 @@ export function useCanvasRuler({ canvasRootRef }: UseCanvasRulerOptions) {
 
   onUnmounted(() => observer?.disconnect())
 
-  function onZoomChange() {}
+  function onZoomChange() {
+    moveableRef.value?.updateRect()
+  }
 
   return {
     canvas,

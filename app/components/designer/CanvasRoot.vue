@@ -10,6 +10,8 @@ import 'vue3-sketch-ruler/lib/style.css'
 
 const canvasRoot = useTemplateRef<HTMLElement>('canvasRoot')
 const stageRef = useTemplateRef<HTMLElement>('stage')
+const moveableRef = useTemplateRef<Moveable>('moveable')
+
 const {
   canvasWidth,
   canvasHeight,
@@ -20,12 +22,10 @@ const {
   scale,
   palette,
   onZoomChange,
-} = useCanvasRuler({ canvasRootRef: canvasRoot })
+} = useCanvasRuler({ canvasRootRef: canvasRoot, moveableRef })
 
 const nodes = ref<Material[]>([])
 const selectedNodeId = ref<string | null>(null)
-
-const moveableRef = useTemplateRef<Moveable>('moveable')
 
 const { onDrag, onResize, onDragGroup, onResizeGroup } = useMoveable(moveableRef, nodes)
 
