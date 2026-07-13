@@ -9,7 +9,7 @@ import {
 } from '@lucide/vue'
 import { computed, useTemplateRef } from 'vue'
 import SketchRuler from 'vue3-sketch-ruler'
-import { useCanvasRuler } from '@/components/designer/useCanvasRuler'
+import { useCanvasRuler } from '~/composables/canvas-ruler'
 import 'vue3-sketch-ruler/lib/style.css'
 
 const metrics = [

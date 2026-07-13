@@ -231,7 +231,7 @@ function downloadPageConfig() {
         </SheetHeader>
 
         <div class="min-h-0 flex-1 overflow-auto bg-muted/30 p-4">
-          <pre class="min-h-full whitespace-pre-wrap break-words rounded-md border bg-background p-3 font-mono text-xs leading-5 text-foreground"><code>{{ formattedPageConfig }}</code></pre>
+          <pre class="min-h-full whitespace-pre-wrap wrap-break-word rounded-md border bg-background p-3 font-mono text-xs leading-5 text-foreground"><code>{{ formattedPageConfig }}</code></pre>
         </div>
 
         <SheetFooter class="flex-row justify-between border-t sm:justify-between">
