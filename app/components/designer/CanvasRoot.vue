@@ -18,7 +18,6 @@ import 'vue3-sketch-ruler/lib/style.css'
 const canvasRoot = useTemplateRef<HTMLElement>('canvas-root')
 const stageRef = useTemplateRef<HTMLElement>('canvas-stage')
 const moveableRef = useTemplateRef<Moveable>('canvas-moveable')
-const selectedTarget = shallowRef<HTMLElement | null>(null)
 
 const editorStore = useEditorStore()
 const { nodes, selectedNode } = storeToRefs(editorStore)
@@ -36,7 +35,8 @@ const {
   onZoomChange,
 } = useCanvasRuler({ canvasRootRef: canvasRoot, moveableRef })
 
-const { onDrag, onResize, onDragGroup, onResizeGroup } = useMoveable(moveableRef, nodes)
+const { onDrag, onResize, onDragGroup, onResizeGroup } = useMoveable(moveableRef)
+const { onSelect, onClearSelected, onSelectEnd, selectedTarget } = useSelection({ stageRef, moveableRef })
 
 function onDrop(e: DragEvent) {
   const data = e.dataTransfer?.getData(DATA_TRANSFER_KEY)
@@ -49,12 +49,6 @@ function onDrop(e: DragEvent) {
 
   editorStore.addNode(node)
   editorStore.selectNodeById(node.id)
-
-  nextTick(() => {
-    selectedTarget.value = stageRef.value?.querySelector(
-      `[${ATTR_NODE_ID}='${node.id}']:not([${ATTR_NODE_LOCKED}='true'])`,
-    ) as HTMLElement
-  })
 }
 
 function getNodeStyle(node: Material, index: number) {
@@ -65,26 +59,6 @@ function getNodeStyle(node: Material, index: number) {
     top: `${node.layout.y}px`,
     zIndex: index + 1,
   }
-}
-
-function onSelect(node: Material, event: MouseEvent) {
-  editorStore.selectNodeById(node.id)
-  selectedTarget.value = event.currentTarget as HTMLElement
-
-  nextTick(() => {
-    moveableRef.value?.dragStart(event)
-  })
-}
-
-function onClearSelected() {
-  editorStore.clearSelectedNode()
-  selectedTarget.value = null
-}
-
-function onSelectEnd(event: any) {
-  selectedTarget.value = event.selected
-  const ids = event.selected.map((e: HTMLElement) => e.getAttribute(ATTR_NODE_ID))
-  editorStore.selectNodesById(ids)
 }
 </script>
 

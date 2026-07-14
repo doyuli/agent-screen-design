@@ -1,13 +1,10 @@
 import type { OnDrag, OnDragGroup, OnResize, OnResizeGroup } from 'vue3-moveable'
 import type Moveable from 'vue3-moveable'
-import type { Material } from '~~/shared/schema/material'
 import { ATTR_NODE_ID } from '~/constants'
 
-export function useMoveable(
-  moveableRef: Ref<Moveable | null>,
-  nodes: Ref<Material[]>,
-) {
+export function useMoveable(moveableRef: Ref<Moveable | null>) {
   const editorStore = useEditorStore()
+  const { nodes } = storeToRefs(editorStore)
 
   function getNodeByTarget(target: HTMLElement) {
     const id = target.getAttribute(ATTR_NODE_ID)
