@@ -6,6 +6,7 @@ export const layoutSchema = z.object({
   y: z.number(),
   width: z.number(),
   height: z.number(),
+  lockRatio: z.boolean(),
 })
 
 export const materialTypeSchema = z.enum([

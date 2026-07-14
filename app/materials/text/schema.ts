@@ -15,6 +15,7 @@ export const textMaterialSchema: MaterialDefinition = {
       y: 0,
       width: 300,
       height: 50,
+      lockRatio: false,
     },
     style: {
       color: '#fff',

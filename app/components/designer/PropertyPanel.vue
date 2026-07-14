@@ -66,6 +66,10 @@ import {
               <Input id="height" model-value="360" />
             </div>
           </div>
+          <div class="flex items-center justify-between rounded-md border bg-background px-3 py-2">
+            <Label for="lock-ratio" class="text-sm">锁定比例</Label>
+            <Switch id="lock-ratio" />
+          </div>
         </TabsContent>
 
         <TabsContent value="style" class="m-0 space-y-5 p-4">
@@ -120,19 +124,9 @@ import {
         </TabsContent>
 
         <TabsContent value="layout" class="m-0 space-y-5 p-4">
-          <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-2">
-              <Label for="padding-x">水平内边距</Label>
-              <Input id="padding-x" model-value="24" />
-            </div>
-            <div class="space-y-2">
-              <Label for="padding-y">垂直内边距</Label>
-              <Input id="padding-y" model-value="18" />
-            </div>
-          </div>
           <div class="flex items-center justify-between rounded-md border bg-background px-3 py-2">
-            <Label for="lock-ratio" class="text-sm">锁定比例</Label>
-            <Switch id="lock-ratio" />
+            <Label for="data-source" class="text-sm">数据源</Label>
+            <Switch id="data-source" />
           </div>
         </TabsContent>
       </ScrollArea>

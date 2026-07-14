@@ -2,6 +2,12 @@
 import type { Material } from '~~/shared/schema/material'
 import Moveable from 'vue3-moveable'
 import SketchRuler from 'vue3-sketch-ruler'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu'
 import { useCanvasRuler } from '~/composables/canvas-ruler'
 import { useMoveable } from '~/composables/moveable'
 import { DATA_TRANSFER_KEY } from '~/constants'
@@ -27,6 +33,9 @@ const {
 
 const nodes = ref<Material[]>([])
 const selectedNodeId = ref<string | null>(null)
+const selectedNode = computed(() => {
+  return nodes.value.find(node => node.id === selectedNodeId.value)
+})
 
 const { onDrag, onResize, onDragGroup, onResizeGroup } = useMoveable(moveableRef, nodes)
 
@@ -89,17 +98,25 @@ watch(
         @zoomchange="onZoomChange"
       >
         <div ref="stage" class="relative" :style="canvasStyle" @dragover.prevent @drop="onDrop">
-          <div
-            v-for="(node, index) in nodes"
-            :key="node.id"
-            :data-node-id="node.id"
-            :data-node-locked="node.locked"
-            class="absolute"
-            :style="getNodeStyle(node, index)"
-            @mousedown="onSelect(node, $event)"
-          >
-            <component :is="getMaterialComponent(node.type)" :schema="node" />
-          </div>
+          <ContextMenu v-for="(node, index) in nodes" :key="node.id">
+            <ContextMenuTrigger>
+              <div
+                :data-node-id="node.id"
+                :data-node-locked="node.locked"
+                class="absolute"
+                :style="getNodeStyle(node, index)"
+                @mousedown="onSelect(node, $event)"
+              >
+                <component :is="getMaterialComponent(node.type)" :schema="node" />
+              </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent class="min-w-0">
+              <ContextMenuItem>复制</ContextMenuItem>
+              <ContextMenuItem>移除</ContextMenuItem>
+              <ContextMenuItem>置顶</ContextMenuItem>
+              <ContextMenuItem>{{ node.locked ? '解锁' : '锁定' }}</ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         </div>
       </SketchRuler>
       <Moveable
@@ -108,6 +125,7 @@ watch(
         :draggable="true"
         :resizable="true"
         :origin="false"
+        :keep-ratio="selectedNode?.layout.lockRatio"
         :snappable="true"
         :snap-container="canvasRoot"
         :horizontal-guidelines="rulerGuidelines.horizontal"

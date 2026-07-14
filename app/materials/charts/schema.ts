@@ -14,6 +14,7 @@ export const areaChartMaterialSchema: MaterialDefinition = {
       y: 0,
       width: 400,
       height: 260,
+      lockRatio: false,
     },
     props: {
       option: {
@@ -120,6 +121,7 @@ export const barChartMaterialSchema: MaterialDefinition = {
       y: 0,
       width: 400,
       height: 260,
+      lockRatio: false,
     },
     props: {
       option: {
@@ -215,6 +217,7 @@ export const lineChartMaterialSchema: MaterialDefinition = {
       y: 0,
       width: 400,
       height: 260,
+      lockRatio: false,
     },
     props: {
       option: {
@@ -318,6 +321,7 @@ export const pieChartMaterialSchema: MaterialDefinition = {
       y: 0,
       width: 400,
       height: 260,
+      lockRatio: false,
     },
     props: {
       option: {
