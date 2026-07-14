@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Material } from '~~/shared/schema/material'
 import Moveable from 'vue3-moveable'
+import Selecto from 'vue3-selecto'
 import SketchRuler from 'vue3-sketch-ruler'
 import {
   ContextMenu,
@@ -10,13 +11,17 @@ import {
 } from '@/components/ui/context-menu'
 import { useCanvasRuler } from '~/composables/canvas-ruler'
 import { useMoveable } from '~/composables/moveable'
-import { DATA_TRANSFER_KEY } from '~/constants'
+import { ATTR_NODE_ID, ATTR_NODE_LOCKED, DATA_TRANSFER_KEY } from '~/constants'
 import { createMaterialNode, getMaterialComponent } from '~/materials'
 import 'vue3-sketch-ruler/lib/style.css'
 
-const canvasRoot = useTemplateRef<HTMLElement>('canvasRoot')
-const stageRef = useTemplateRef<HTMLElement>('stage')
-const moveableRef = useTemplateRef<Moveable>('moveable')
+const canvasRoot = useTemplateRef<HTMLElement>('canvas-root')
+const stageRef = useTemplateRef<HTMLElement>('canvas-stage')
+const moveableRef = useTemplateRef<Moveable>('canvas-moveable')
+const selectedTarget = shallowRef<HTMLElement | null>(null)
+
+const editorStore = useEditorStore()
+const { nodes, selectedNode } = storeToRefs(editorStore)
 
 const {
   canvasWidth,
@@ -31,12 +36,6 @@ const {
   onZoomChange,
 } = useCanvasRuler({ canvasRootRef: canvasRoot, moveableRef })
 
-const nodes = ref<Material[]>([])
-const selectedNodeId = ref<string | null>(null)
-const selectedNode = computed(() => {
-  return nodes.value.find(node => node.id === selectedNodeId.value)
-})
-
 const { onDrag, onResize, onDragGroup, onResizeGroup } = useMoveable(moveableRef, nodes)
 
 function onDrop(e: DragEvent) {
@@ -48,8 +47,14 @@ function onDrop(e: DragEvent) {
   node.layout.x = e.offsetX - node.layout.width / 2
   node.layout.y = e.offsetY - node.layout.height / 2
 
-  nodes.value.push(node)
-  selectedNodeId.value = node.id
+  editorStore.addNode(node)
+  editorStore.selectNodeById(node.id)
+
+  nextTick(() => {
+    selectedTarget.value = stageRef.value?.querySelector(
+      `[${ATTR_NODE_ID}='${node.id}']:not([${ATTR_NODE_LOCKED}='true'])`,
+    ) as HTMLElement
+  })
 }
 
 function getNodeStyle(node: Material, index: number) {
@@ -63,28 +68,29 @@ function getNodeStyle(node: Material, index: number) {
 }
 
 function onSelect(node: Material, event: MouseEvent) {
-  selectedNodeId.value = node.id
-  event.stopPropagation()
+  editorStore.selectNodeById(node.id)
+  selectedTarget.value = event.currentTarget as HTMLElement
+
+  nextTick(() => {
+    moveableRef.value?.dragStart(event)
+  })
 }
 
-const selectedTarget = shallowRef<HTMLElement | null>(null)
-watch(
-  () => selectedNodeId.value,
-  (newVal) => {
-    if (newVal) {
-      const target = stageRef.value?.querySelector(`[data-node-id='${newVal}']:not([data-node-locked='true'])`)
-      if (target) {
-        selectedTarget.value = target as HTMLElement
-      }
-    }
-  },
-  { deep: true, flush: 'post' },
-)
+function onClearSelected() {
+  editorStore.clearSelectedNode()
+  selectedTarget.value = null
+}
+
+function onSelectEnd(event: any) {
+  selectedTarget.value = event.selected
+  const ids = event.selected.map((e: HTMLElement) => e.getAttribute(ATTR_NODE_ID))
+  editorStore.selectNodesById(ids)
+}
 </script>
 
 <template>
   <section class="relative min-w-0 overflow-hidden bg-muted/40">
-    <div ref="canvasRoot" class="relative h-full overflow-hidden isolate">
+    <div ref="canvas-root" class="relative h-full overflow-hidden isolate">
       <SketchRuler
         v-if="rectWidth > 0 && rectHeight > 0"
         v-model:scale="scale"
@@ -97,12 +103,19 @@ watch(
         :palette="palette"
         @zoomchange="onZoomChange"
       >
-        <div ref="stage" class="relative" :style="canvasStyle" @dragover.prevent @drop="onDrop">
+        <div
+          ref="canvas-stage"
+          class="relative"
+          :style="canvasStyle"
+          @dragover.prevent
+          @drop="onDrop"
+          @mousedown.self="onClearSelected"
+        >
           <ContextMenu v-for="(node, index) in nodes" :key="node.id">
             <ContextMenuTrigger>
               <div
-                :data-node-id="node.id"
-                :data-node-locked="node.locked"
+                :[ATTR_NODE_ID]="node.id"
+                :[ATTR_NODE_LOCKED]="node.locked"
                 class="absolute"
                 :style="getNodeStyle(node, index)"
                 @mousedown="onSelect(node, $event)"
@@ -119,8 +132,17 @@ watch(
           </ContextMenu>
         </div>
       </SketchRuler>
+      <Selecto
+        v-if="stageRef"
+        :container="stageRef"
+        :drag-container="stageRef"
+        :select-from-inside="false"
+        toggle-continue-select="shift"
+        :selectable-targets="[`[${ATTR_NODE_ID}]`]"
+        @select-end="onSelectEnd"
+      />
       <Moveable
-        ref="moveable"
+        ref="canvas-moveable"
         :target="selectedTarget"
         :draggable="true"
         :resizable="true"
