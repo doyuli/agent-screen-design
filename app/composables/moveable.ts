@@ -1,8 +1,9 @@
+import type { TemplateRef } from 'vue'
 import type { OnDrag, OnDragGroup, OnResize, OnResizeGroup } from 'vue3-moveable'
 import type Moveable from 'vue3-moveable'
 import { ATTR_NODE_ID } from '~/constants'
 
-export function useMoveable(moveableRef: Ref<Moveable | null>) {
+export function useMoveable(moveableRef: TemplateRef<Moveable>) {
   const editorStore = useEditorStore()
   const { nodes } = storeToRefs(editorStore)
 

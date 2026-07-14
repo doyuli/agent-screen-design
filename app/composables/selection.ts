@@ -1,10 +1,11 @@
+import type { TemplateRef } from 'vue'
 import type Moveable from 'vue3-moveable'
 import type { Material } from '~~/shared/schema/material'
 import { ATTR_NODE_ID, ATTR_NODE_LOCKED } from '~/constants'
 
 interface UseSelectionOptions {
-  stageRef: Ref<HTMLElement | null>
-  moveableRef: Ref<Moveable | null>
+  stageRef: TemplateRef<HTMLElement>
+  moveableRef: TemplateRef<Moveable>
 }
 
 export function useSelection({ stageRef, moveableRef }: UseSelectionOptions) {
