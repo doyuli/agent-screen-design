@@ -3,12 +3,7 @@ import type { MaterialSchema } from '~~/shared/schema/material'
 import Moveable from 'vue3-moveable'
 import Selecto from 'vue3-selecto'
 import SketchRuler from 'vue3-sketch-ruler'
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { useCanvasRuler } from '~/composables/canvas-ruler'
 import { useMoveable } from '~/composables/moveable'
 import { ATTR_NODE_ID, ATTR_NODE_LOCKED, DATA_TRANSFER_KEY } from '~/constants'
@@ -18,9 +13,10 @@ import 'vue3-sketch-ruler/lib/style.css'
 const canvasRoot = useTemplateRef<HTMLElement>('canvas-root')
 const stageRef = useTemplateRef<HTMLElement>('canvas-stage')
 const moveableRef = useTemplateRef<Moveable>('canvas-moveable')
+const sketchRulerRef = useTemplateRef<InstanceType<typeof SketchRuler>>('sketch-ruler')
 
 const editorStore = useEditorStore()
-const { nodes, selectedNode } = storeToRefs(editorStore)
+const { nodes, selectedNode, canvasScale } = storeToRefs(editorStore)
 
 const {
   canvasWidth,
@@ -29,7 +25,6 @@ const {
   rectWidth,
   rectHeight,
   lines,
-  scale,
   rulerGuidelines,
   palette,
   onZoomChange,
@@ -37,6 +32,17 @@ const {
 
 const { onDrag, onResize, onDragGroup, onResizeGroup } = useMoveable(moveableRef)
 const { onSelect, onClearSelected, onSelectEnd, selectedTarget } = useSelection({ stageRef, moveableRef })
+
+watch(canvasScale, (scale) => {
+  const panzoom = unref((sketchRulerRef.value as any)?.panzoomInstance)
+  const rect = stageRef.value?.parentElement?.parentElement?.getBoundingClientRect()
+  if (panzoom && rect && panzoom.getScale() !== scale) {
+    panzoom.zoomToPoint(scale, {
+      clientX: rect.left + rect.width / 2,
+      clientY: rect.top + rect.height / 2,
+    })
+  }
+})
 
 function onDrop(e: DragEvent) {
   const data = e.dataTransfer?.getData(DATA_TRANSFER_KEY)
@@ -67,7 +73,8 @@ function getNodeStyle(node: MaterialSchema, index: number) {
     <div ref="canvas-root" class="relative h-full overflow-hidden isolate">
       <SketchRuler
         v-if="rectWidth > 0 && rectHeight > 0"
-        v-model:scale="scale"
+        ref="sketch-ruler"
+        v-model:scale="canvasScale"
         :width="rectWidth"
         :height="rectHeight"
         :canvas-width="canvasWidth"
@@ -128,7 +135,7 @@ function getNodeStyle(node: MaterialSchema, index: number) {
         :vertical-guidelines="rulerGuidelines.vertical"
         :snap-horizontal-threshold="5"
         :snap-vertical-threshold="5"
-        :zoom="scale"
+        :zoom="canvasScale"
         @drag="onDrag"
         @resize="onResize"
         @drag-group="onDragGroup"

@@ -52,6 +52,11 @@ const jsonOpen = ref(false)
 const copyState = ref<'idle' | 'copied' | 'failed'>('idle')
 const formattedPageConfig = computed(() => props.pageJson || '{}')
 
+const editorStore = useEditorStore()
+const { pageSchema, canvasScale } = storeToRefs(editorStore)
+
+const canvasScalePercentage = computed(() => Math.round(canvasScale.value * 100))
+
 function openJson() {
   copyState.value = 'idle'
   jsonOpen.value = true
@@ -159,7 +164,7 @@ function downloadPageConfig() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="ghost" size="icon-sm" @click="editorStore.stepCanvasScale(-0.1)">
                 <ZoomOut class="size-4" aria-hidden="true" />
                 <span class="sr-only">缩小</span>
               </Button>
@@ -167,11 +172,11 @@ function downloadPageConfig() {
             <TooltipContent>缩小</TooltipContent>
           </Tooltip>
           <Badge variant="outline" class="h-7 rounded-md px-2 text-xs font-medium">
-            100%
+            {{ canvasScalePercentage }}%
           </Badge>
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="ghost" size="icon-sm" @click="editorStore.stepCanvasScale(0.1)">
                 <ZoomIn class="size-4" aria-hidden="true" />
                 <span class="sr-only">放大</span>
               </Button>
@@ -184,7 +189,7 @@ function downloadPageConfig() {
 
         <div class="min-w-0">
           <div class="truncate text-sm font-medium">
-            城市运营大屏 / 首页
+            {{ pageSchema.name }}
           </div>
           <div class="hidden text-xs text-muted-foreground sm:block">
             1920 x 1080 · 已自动保存

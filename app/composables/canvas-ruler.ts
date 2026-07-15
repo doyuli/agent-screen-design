@@ -15,24 +15,23 @@ interface RulerZoomChange {
 }
 
 export function useCanvasRuler({ canvasRootRef, moveableRef }: UseCanvasRulerOptions) {
-  const canvas = ref({
-    width: 1920,
-    height: 1080,
-    backgroundColor: '#07111f',
-  })
+  const editorStore = useEditorStore()
+  const { canvas } = storeToRefs(editorStore)
+
   const canvasWidth = computed(() => canvas.value.width)
   const canvasHeight = computed(() => canvas.value.height)
+  const canvasScale = computed(() => editorStore.canvasScale)
   const canvasStyle = computed(() => ({
     width: `${canvasWidth.value}px`,
     height: `${canvasHeight.value}px`,
     backgroundColor: canvas.value.backgroundColor,
   }))
+
   const lines = ref({ h: [], v: [] })
-  const scale = ref(1)
   const canvasTransform = ref({ x: 0, y: 0 })
   const rulerGuidelines = computed(() => ({
-    horizontal: lines.value.h.map(y => canvasTransform.value.y + y * scale.value),
-    vertical: lines.value.v.map(x => canvasTransform.value.x + x * scale.value),
+    horizontal: lines.value.h.map(y => canvasTransform.value.y + y * canvasScale.value),
+    vertical: lines.value.v.map(x => canvasTransform.value.x + x * canvasScale.value),
   }))
 
   const palette = {
@@ -88,7 +87,6 @@ export function useCanvasRuler({ canvasRootRef, moveableRef }: UseCanvasRulerOpt
     rectWidth,
     rectHeight,
     lines,
-    scale,
     rulerGuidelines,
     palette,
     onZoomChange,
