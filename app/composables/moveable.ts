@@ -49,7 +49,7 @@ export function useMoveable(moveableRef: TemplateRef<Moveable>) {
   watch(
     () => nodes.value.map(node => node.layout),
     () => moveableRef.value?.updateRect(undefined, true),
-    { flush: 'post' },
+    { flush: 'post', deep: true },
   )
 
   return {

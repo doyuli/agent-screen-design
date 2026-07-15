@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { RatioDimension } from '~/composables/use-ratio-lock'
+import type { RatioDimension } from '~/utils/dimension'
 import { ColorPicker } from '@/components/ui/color'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { updateDimension } from '~/utils/dimension'
 
 const editorStore = useEditorStore()
 const { pageSchema, canvas } = storeToRefs(editorStore)
@@ -10,7 +11,7 @@ const drafts = reactive({
   width: canvas.value.width,
   height: canvas.value.height,
 })
-const { lockRatio, updateDimension } = useRatioLock(canvas)
+const lockRatio = ref(false)
 
 function resetDrafts() {
   drafts.width = canvas.value.width
@@ -20,7 +21,7 @@ function resetDrafts() {
 function commitDimension(dimension: RatioDimension) {
   const value = drafts[dimension]
   if (value > 0)
-    updateDimension(dimension, value)
+    updateDimension(canvas.value, dimension, value, lockRatio.value)
 
   resetDrafts()
 }
