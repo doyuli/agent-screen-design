@@ -5,12 +5,13 @@ import { defineStore } from 'pinia'
 export const useEditorStore = defineStore('editor', () => {
   const panelCollapsed = reactive({
     material: false,
-    layer: false,
+    layer: true,
     property: false,
   })
 
   const pageSchema = ref<PageSchema>({
     name: '城市运营大屏',
+    type: 'page',
     canvas: {
       width: 1920,
       height: 1080,

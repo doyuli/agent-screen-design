@@ -53,7 +53,7 @@ const copyState = ref<'idle' | 'copied' | 'failed'>('idle')
 const formattedPageConfig = computed(() => props.pageJson || '{}')
 
 const editorStore = useEditorStore()
-const { pageSchema, canvasScale } = storeToRefs(editorStore)
+const { pageSchema, canvasScale, canvas } = storeToRefs(editorStore)
 
 const canvasScalePercentage = computed(() => Math.round(canvasScale.value * 100))
 
@@ -192,7 +192,7 @@ function downloadPageConfig() {
             {{ pageSchema.name }}
           </div>
           <div class="hidden text-xs text-muted-foreground sm:block">
-            1920 x 1080 · 已自动保存
+            {{ canvas.width }} x {{ canvas.height }} · 已自动保存
           </div>
         </div>
       </div>
