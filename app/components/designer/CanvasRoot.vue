@@ -66,6 +66,8 @@ function getNodeStyle(node: MaterialSchema, index: number) {
     zIndex: index + 1,
   }
 }
+
+const { getCommands } = useCommands()
 </script>
 
 <template>
@@ -105,10 +107,9 @@ function getNodeStyle(node: MaterialSchema, index: number) {
               </div>
             </ContextMenuTrigger>
             <ContextMenuContent class="min-w-0">
-              <ContextMenuItem>复制</ContextMenuItem>
-              <ContextMenuItem>移除</ContextMenuItem>
-              <ContextMenuItem>置顶</ContextMenuItem>
-              <ContextMenuItem>{{ node.locked ? '解锁' : '锁定' }}</ContextMenuItem>
+              <ContextMenuItem v-for="command in getCommands(node)" :key="command.key" @click="command.onClick(node)">
+                {{ typeof command.label === 'function' ? command.label(node) : command.label }}
+              </ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
         </div>

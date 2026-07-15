@@ -1,6 +1,7 @@
 import type { MaterialSchema } from '~~/shared/schema/material'
 import type { PageSchema } from '~~/shared/schema/page'
 import { defineStore } from 'pinia'
+import { deepClone } from '~/utils'
 
 export const useEditorStore = defineStore('editor', () => {
   const panelCollapsed = reactive({
@@ -54,6 +55,32 @@ export const useEditorStore = defineStore('editor', () => {
 
   function toggleNodeLock(node: MaterialSchema) {
     node.locked = !node.locked
+    if (node.locked)
+      clearSelectedNode()
+  }
+
+  function copyNode(node: MaterialSchema, offset = 20) {
+    const newNode = deepClone(node)
+    newNode.id = crypto.randomUUID()
+    newNode.layout.x += offset
+    newNode.layout.y += offset
+    addNode(newNode)
+    selectNodeById(newNode.id)
+  }
+
+  function removeNode(node: MaterialSchema) {
+    nodes.value = nodes.value.filter(n => n.id !== node.id)
+    selectedNodeIds.value = selectedNodeIds.value.filter(id => id !== node.id)
+  }
+
+  function moveNodeToTop(node: MaterialSchema) {
+    nodes.value = nodes.value.filter(n => n.id !== node.id)
+    nodes.value.push(node)
+  }
+
+  function moveNodeToBottom(node: MaterialSchema) {
+    nodes.value = nodes.value.filter(n => n.id !== node.id)
+    nodes.value.unshift(node)
   }
 
   return {
@@ -67,6 +94,10 @@ export const useEditorStore = defineStore('editor', () => {
     selectedNode,
     findNodeById,
     addNode,
+    copyNode,
+    removeNode,
+    moveNodeToTop,
+    moveNodeToBottom,
     selectNodeById,
     selectNodesById,
     clearSelectedNode,
