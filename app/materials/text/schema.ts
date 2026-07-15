@@ -1,7 +1,7 @@
-import type { MaterialDefinition } from '~~/shared/schema/material'
+import type { MaterialDefinitionSchema } from '~~/shared/schema/material'
 import { TextIcon } from '@lucide/vue'
 
-export const textMaterialSchema: MaterialDefinition = {
+export const textMaterialSchema: MaterialDefinitionSchema = {
   name: 'text',
   group: 'basics',
   icon: TextIcon,

@@ -40,10 +40,10 @@ export const materialDefinitionSchema = z.object({
   schema: materialSchema.omit({ id: true }),
 })
 
-export type MaterialType = z.infer<typeof materialTypeSchema>
+export type MaterialTypeSchema = z.infer<typeof materialTypeSchema>
 
-export type MaterialGroup = z.infer<typeof materialGroupSchema>
+export type MaterialGroupSchema = z.infer<typeof materialGroupSchema>
 
-export type Material = z.infer<typeof materialSchema>
+export type MaterialSchema = z.infer<typeof materialSchema>
 
-export type MaterialDefinition = z.infer<typeof materialDefinitionSchema>
+export type MaterialDefinitionSchema = z.infer<typeof materialDefinitionSchema>

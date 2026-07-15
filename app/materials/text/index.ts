@@ -1,4 +1,4 @@
-import type { Material } from '~~/shared/schema/material'
+import type { MaterialSchema } from '~~/shared/schema/material'
 import type { RegisterFunction } from '..'
 import { computed, defineComponent, h } from 'vue'
 import { textMaterialSchema } from './schema'
@@ -6,7 +6,7 @@ import { textMaterialSchema } from './schema'
 export const TextMaterial = defineComponent({
   name: 'TextMaterial',
   props: ['schema'],
-  setup(props: { schema: Material }) {
+  setup(props: { schema: MaterialSchema }) {
     const style = computed(() => {
       const s = props.schema.style ?? {}
       return {

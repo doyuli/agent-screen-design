@@ -25,7 +25,7 @@ const pageJson = JSON.stringify(pageConfig, null, 2)
 
 const layoutColumns = computed(() => [
   panelCollapsed.material ? '0px' : '240px',
-  panelCollapsed.layer ? '0px' : '208px',
+  panelCollapsed.layer ? '0px' : '198px',
   'minmax(0, 1fr)',
   panelCollapsed.property ? '0px' : '320px',
 ].join(' '))

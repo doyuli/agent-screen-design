@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Material } from '~~/shared/schema/material'
+import type { MaterialSchema } from '~~/shared/schema/material'
 import Moveable from 'vue3-moveable'
 import Selecto from 'vue3-selecto'
 import SketchRuler from 'vue3-sketch-ruler'
@@ -51,7 +51,7 @@ function onDrop(e: DragEvent) {
   editorStore.selectNodeById(node.id)
 }
 
-function getNodeStyle(node: Material, index: number) {
+function getNodeStyle(node: MaterialSchema, index: number) {
   return {
     width: `${node.layout.width}px`,
     height: `${node.layout.height}px`,

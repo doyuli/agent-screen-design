@@ -1,11 +1,11 @@
 import type { Component } from 'vue'
-import type { Material, MaterialDefinition, MaterialGroup, MaterialType } from '~~/shared/schema/material'
+import type { MaterialDefinitionSchema, MaterialGroupSchema, MaterialSchema, MaterialTypeSchema } from '~~/shared/schema/material'
 
-const materials: MaterialDefinition[] = []
-const componentMap = new Map<MaterialType, Component>()
-const materialMap = new Map<MaterialType, MaterialDefinition>()
+const materials: MaterialDefinitionSchema[] = []
+const componentMap = new Map<MaterialTypeSchema, Component>()
+const materialMap = new Map<MaterialTypeSchema, MaterialDefinitionSchema>()
 
-export type RegisterFunction = (material: MaterialDefinition, component: Component) => void
+export type RegisterFunction = (material: MaterialDefinitionSchema, component: Component) => void
 
 export const register: RegisterFunction = (material, component) => {
   materials.push(material)
@@ -22,7 +22,7 @@ Object.values(materialModules).forEach((m: any) => {
   }
 })
 
-const MATERIAL_GROUPS: { key: MaterialGroup, name: string }[] = [
+const MATERIAL_GROUPS: { key: MaterialGroupSchema, name: string }[] = [
   {
     name: '基础',
     key: 'basics',
@@ -37,7 +37,7 @@ export function getAllMaterials() {
   return [...materials]
 }
 
-export function getMaterialsByGroup(group: MaterialGroup) {
+export function getMaterialsByGroup(group: MaterialGroupSchema) {
   return materials.filter(material => material.group === group)
 }
 
@@ -45,11 +45,11 @@ export function getMaterialGroups() {
   return MATERIAL_GROUPS
 }
 
-export function getMaterialComponent(type: MaterialType) {
+export function getMaterialComponent(type: MaterialTypeSchema) {
   return componentMap.get(type)
 }
 
-export function createMaterialNode(node: MaterialDefinition['schema']): Material {
+export function createMaterialNode(node: MaterialDefinitionSchema['schema']): MaterialSchema {
   return {
     ...node,
     id: crypto.randomUUID(),

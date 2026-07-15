@@ -1,7 +1,7 @@
-import type { MaterialDefinition } from '~~/shared/schema/material'
+import type { MaterialDefinitionSchema } from '~~/shared/schema/material'
 import { AreaChartIcon, BarChartIcon, LineChartIcon, PieChartIcon } from '@lucide/vue'
 
-export const areaChartMaterialSchema: MaterialDefinition = {
+export const areaChartMaterialSchema: MaterialDefinitionSchema = {
   name: '面积图',
   group: 'charts',
   icon: AreaChartIcon,
@@ -108,7 +108,7 @@ export const areaChartMaterialSchema: MaterialDefinition = {
   },
 }
 
-export const barChartMaterialSchema: MaterialDefinition = {
+export const barChartMaterialSchema: MaterialDefinitionSchema = {
   name: '柱状图',
   group: 'charts',
   icon: BarChartIcon,
@@ -204,7 +204,7 @@ export const barChartMaterialSchema: MaterialDefinition = {
   },
 }
 
-export const lineChartMaterialSchema: MaterialDefinition = {
+export const lineChartMaterialSchema: MaterialDefinitionSchema = {
   name: '折线图',
   group: 'charts',
   icon: LineChartIcon,
@@ -308,7 +308,7 @@ export const lineChartMaterialSchema: MaterialDefinition = {
   },
 }
 
-export const pieChartMaterialSchema: MaterialDefinition = {
+export const pieChartMaterialSchema: MaterialDefinitionSchema = {
   name: '饼图',
   group: 'charts',
   icon: PieChartIcon,

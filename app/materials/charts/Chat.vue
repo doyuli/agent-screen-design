@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EChartsOption, EChartsType } from 'echarts'
-import type { Material } from '~~/shared/schema/material'
+import type { MaterialSchema } from '~~/shared/schema/material'
 import { init } from 'echarts'
 
 defineOptions({
@@ -8,7 +8,7 @@ defineOptions({
 })
 
 const props = defineProps<{
-  schema: Material
+  schema: MaterialSchema
 }>()
 
 const chartRef = useTemplateRef('chartRef')

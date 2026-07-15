@@ -16,7 +16,7 @@ import {
 <template>
   <aside class="flex h-full min-h-0 flex-col border-l bg-sidebar text-sidebar-foreground">
     <div class="border-b px-4 py-3">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between h-6">
         <h2 class="text-sm font-semibold">
           属性
         </h2>

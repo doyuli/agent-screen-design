@@ -1,21 +1,17 @@
 <script setup lang="ts">
-import type { MaterialDefinition, MaterialGroup } from '~~/shared/schema/material'
+import type { MaterialDefinitionSchema, MaterialGroupSchema } from '~~/shared/schema/material'
 import { ref } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DATA_TRANSFER_KEY } from '~/constants'
 import { getAllMaterials, getMaterialGroups, getMaterialsByGroup } from '~/materials'
 
 const materialGroups = getMaterialGroups()
-const activeGroup = ref<MaterialGroup>(materialGroups[0]?.key ?? 'basics')
+const activeGroup = ref<MaterialGroupSchema>(materialGroups[0]?.key ?? 'basics')
 
-function onDragStart(schema: MaterialDefinition['schema'], e: DragEvent) {
+function onDragStart(schema: MaterialDefinitionSchema['schema'], e: DragEvent) {
   e.dataTransfer?.setData(DATA_TRANSFER_KEY, JSON.stringify(schema))
 }
 </script>
@@ -23,7 +19,7 @@ function onDragStart(schema: MaterialDefinition['schema'], e: DragEvent) {
 <template>
   <aside class="flex h-full min-h-0 flex-col border-r bg-sidebar text-sidebar-foreground">
     <div class="border-b px-4 py-3">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between h-6">
         <h2 class="text-sm font-semibold">
           物料
         </h2>

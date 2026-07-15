@@ -1,6 +1,6 @@
 import type { TemplateRef } from 'vue'
 import type Moveable from 'vue3-moveable'
-import type { Material } from '~~/shared/schema/material'
+import type { MaterialSchema } from '~~/shared/schema/material'
 import { ATTR_NODE_ID, ATTR_NODE_LOCKED } from '~/constants'
 
 interface UseSelectionOptions {
@@ -28,7 +28,7 @@ export function useSelection({ stageRef, moveableRef }: UseSelectionOptions) {
     { deep: true, flush: 'post' },
   )
 
-  function onSelect(node: Material, event: MouseEvent) {
+  function onSelect(node: MaterialSchema, event: MouseEvent) {
     editorStore.selectNodeById(node.id)
 
     nextTick(() => {
