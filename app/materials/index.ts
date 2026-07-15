@@ -49,6 +49,10 @@ export function getMaterialComponent(type: MaterialTypeSchema) {
   return componentMap.get(type)
 }
 
+export function getMaterialFields(type: MaterialTypeSchema) {
+  return materialMap.get(type)?.fields || []
+}
+
 export function createMaterialNode(node: MaterialDefinitionSchema['schema']): MaterialSchema {
   return {
     ...node,

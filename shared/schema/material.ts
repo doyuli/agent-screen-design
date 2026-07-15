@@ -33,12 +33,35 @@ export const materialSchema = z.object({
   props: z.record(z.string(), z.unknown()),
 })
 
+export const fieldTypeSchema = z.enum([
+  'input',
+  'number',
+  'switch',
+  'select',
+  'checkbox',
+  'color',
+  'separator',
+])
+
+export const fieldSchema = z.object({
+  key: z.string(),
+  label: z.string(),
+  type: fieldTypeSchema,
+  span: z.number().optional(),
+  props: z.record(z.string(), z.unknown()).optional(),
+})
+
 export const materialDefinitionSchema = z.object({
   name: z.string(),
   group: materialGroupSchema,
   icon: z.custom<Component>(),
   schema: materialSchema.omit({ id: true }),
+  fields: z.array(fieldSchema),
 })
+
+export type FieldSchema = z.infer<typeof fieldSchema>
+
+export type FieldTypeSchema = z.infer<typeof fieldTypeSchema>
 
 export type MaterialTypeSchema = z.infer<typeof materialTypeSchema>
 

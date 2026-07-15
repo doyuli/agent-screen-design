@@ -106,6 +106,93 @@ export const areaChartMaterialSchema: MaterialDefinitionSchema = {
       },
     },
   },
+  fields: [
+    {
+      key: 'props.option.title.text',
+      label: '标题',
+      type: 'input',
+    },
+    {
+      key: 'props.option.title.textStyle.color',
+      label: '标题色',
+      type: 'color',
+    },
+    {
+      key: 'props.option.legend.show',
+      label: '图例显示',
+      type: 'checkbox',
+    },
+    {
+      key: '',
+      label: '',
+      type: 'separator',
+    },
+    {
+      key: 'props.option.title.left',
+      label: '对齐',
+      type: 'select',
+      props: {
+        options: [
+          { label: '左对齐', value: 'left' },
+          { label: '居中', value: 'center' },
+          { label: '右对齐', value: 'right' },
+        ],
+      },
+    },
+    {
+      key: 'props.option.series.0.lineStyle.color',
+      label: '线颜色',
+      type: 'color',
+      span: 12,
+    },
+    {
+      key: 'props.option.series.0.areaStyle.color',
+      label: '面积色',
+      type: 'color',
+      span: 12,
+    },
+    {
+      key: 'props.option.series.0.encode.x',
+      label: 'X字段',
+      type: 'input',
+      span: 12,
+    },
+    {
+      key: 'props.option.series.0.encode.y',
+      label: 'Y字段',
+      type: 'input',
+      span: 12,
+    },
+    {
+      key: '',
+      label: '',
+      type: 'separator',
+    },
+    {
+      key: 'props.option.grid.top',
+      label: '上边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.right',
+      label: '右边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.bottom',
+      label: '下边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.left',
+      label: '左边距',
+      type: 'number',
+      span: 12,
+    },
+  ],
 }
 
 export const barChartMaterialSchema: MaterialDefinitionSchema = {
@@ -202,6 +289,86 @@ export const barChartMaterialSchema: MaterialDefinitionSchema = {
       },
     },
   },
+  fields: [
+    {
+      key: 'props.option.title.text',
+      label: '标题',
+      type: 'input',
+    },
+    {
+      key: 'props.option.title.textStyle.color',
+      label: '标题色',
+      type: 'color',
+    },
+    {
+      key: 'props.option.legend.show',
+      label: '图例显示',
+      type: 'checkbox',
+    },
+    {
+      key: '',
+      label: '',
+      type: 'separator',
+    },
+    {
+      key: 'props.option.title.left',
+      label: '对齐',
+      type: 'select',
+      props: {
+        options: [
+          { label: '左对齐', value: 'left' },
+          { label: '居中', value: 'center' },
+          { label: '右对齐', value: 'right' },
+        ],
+      },
+    },
+    {
+      key: 'props.option.series.0.itemStyle.color',
+      label: '柱颜色',
+      type: 'color',
+    },
+    {
+      key: 'props.option.series.0.encode.x',
+      label: 'X字段',
+      type: 'input',
+      span: 12,
+    },
+    {
+      key: 'props.option.series.0.encode.y',
+      label: 'Y字段',
+      type: 'input',
+      span: 12,
+    },
+    {
+      key: '',
+      label: '',
+      type: 'separator',
+    },
+    {
+      key: 'props.option.grid.top',
+      label: '上边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.right',
+      label: '右边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.bottom',
+      label: '下边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.left',
+      label: '左边距',
+      type: 'number',
+      span: 12,
+    },
+  ],
 }
 
 export const lineChartMaterialSchema: MaterialDefinitionSchema = {
@@ -306,6 +473,86 @@ export const lineChartMaterialSchema: MaterialDefinitionSchema = {
       },
     },
   },
+  fields: [
+    {
+      key: 'props.option.title.text',
+      label: '标题',
+      type: 'input',
+    },
+    {
+      key: 'props.option.title.textStyle.color',
+      label: '标题色',
+      type: 'color',
+    },
+    {
+      key: 'props.option.legend.show',
+      label: '图例显示',
+      type: 'checkbox',
+    },
+    {
+      key: '',
+      label: '',
+      type: 'separator',
+    },
+    {
+      key: 'props.option.title.left',
+      label: '对齐',
+      type: 'select',
+      props: {
+        options: [
+          { label: '左对齐', value: 'left' },
+          { label: '居中', value: 'center' },
+          { label: '右对齐', value: 'right' },
+        ],
+      },
+    },
+    {
+      key: 'props.option.series.0.lineStyle.color',
+      label: '线颜色',
+      type: 'color',
+    },
+    {
+      key: 'props.option.series.0.encode.x',
+      label: 'X字段',
+      type: 'input',
+      span: 12,
+    },
+    {
+      key: 'props.option.series.0.encode.y',
+      label: 'Y字段',
+      type: 'input',
+      span: 12,
+    },
+    {
+      key: '',
+      label: '',
+      type: 'separator',
+    },
+    {
+      key: 'props.option.grid.top',
+      label: '上边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.right',
+      label: '右边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.bottom',
+      label: '下边距',
+      type: 'number',
+      span: 12,
+    },
+    {
+      key: 'props.option.grid.left',
+      label: '左边距',
+      type: 'number',
+      span: 12,
+    },
+  ],
 }
 
 export const pieChartMaterialSchema: MaterialDefinitionSchema = {
@@ -379,4 +626,55 @@ export const pieChartMaterialSchema: MaterialDefinitionSchema = {
       },
     },
   },
+  fields: [
+    {
+      key: 'props.option.title.text',
+      label: '标题',
+      type: 'input',
+    },
+    {
+      key: 'props.option.title.textStyle.color',
+      label: '标题色',
+      type: 'color',
+    },
+    {
+      key: 'props.option.legend.show',
+      label: '图例显示',
+      type: 'checkbox',
+    },
+    {
+      key: '',
+      label: '',
+      type: 'separator',
+    },
+    {
+      key: 'props.option.title.left',
+      label: '对齐',
+      type: 'select',
+      props: {
+        options: [
+          { label: '左对齐', value: 'left' },
+          { label: '居中', value: 'center' },
+          { label: '右对齐', value: 'right' },
+        ],
+      },
+    },
+    {
+      key: 'props.option.color.0',
+      label: '主色',
+      type: 'color',
+    },
+    {
+      key: 'props.option.series.0.encode.itemName',
+      label: '名称字段',
+      type: 'input',
+      span: 12,
+    },
+    {
+      key: 'props.option.series.0.encode.value',
+      label: '数值字段',
+      type: 'input',
+      span: 12,
+    },
+  ],
 }

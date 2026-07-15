@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { AlignCenter, Database, Paintbrush } from '@lucide/vue'
+import { FormBuilder } from '@/components/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { getMaterialFields } from '~/materials'
+
+const editorStore = useEditorStore()
+const { selectedNode } = storeToRefs(editorStore)
+
+const styleFields = computed(() => getMaterialFields(selectedNode.value!.type))
 </script>
 
 <template>
@@ -55,54 +61,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
       </TabsContent>
 
       <TabsContent value="style" class="m-0 space-y-5 p-4">
-        <section class="space-y-3">
-          <h3 class="text-sm font-medium">
-            标题
-          </h3>
-          <div class="space-y-2">
-            <Label for="chart-title">标题文本</Label>
-            <Input id="chart-title" model-value="实时交易趋势" />
-          </div>
-          <div class="flex items-center justify-between rounded-md border bg-background px-3 py-2">
-            <Label for="show-title" class="text-sm">显示标题</Label>
-            <Switch id="show-title" :default-value="true" />
-          </div>
-        </section>
-
-        <Separator />
-
-        <section class="space-y-3">
-          <h3 class="text-sm font-medium">
-            图表色板
-          </h3>
-          <div class="grid grid-cols-5 gap-2">
-            <button
-              v-for="color in ['#22d3ee', '#34d399', '#f59e0b', '#60a5fa', '#f472b6']"
-              :key="color"
-              type="button"
-              class="aspect-square rounded-md border shadow-xs"
-              :style="{ backgroundColor: color }"
-            >
-              <span class="sr-only">{{ color }}</span>
-            </button>
-          </div>
-        </section>
-
-        <Separator />
-
-        <section class="space-y-3">
-          <h3 class="text-sm font-medium">
-            容器
-          </h3>
-          <div class="flex items-center justify-between rounded-md border bg-background px-3 py-2">
-            <Label for="glass-bg" class="text-sm">半透明背景</Label>
-            <Switch id="glass-bg" :default-value="true" />
-          </div>
-          <div class="flex items-center justify-between rounded-md border bg-background px-3 py-2">
-            <Label for="border" class="text-sm">显示边框</Label>
-            <Switch id="border" :default-value="true" />
-          </div>
-        </section>
+        <FormBuilder :fields="styleFields" :form-data="selectedNode!" />
       </TabsContent>
 
       <TabsContent value="data-base" class="m-0 space-y-5 p-4">

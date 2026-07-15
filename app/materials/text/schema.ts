@@ -25,4 +25,21 @@ export const textMaterialSchema: MaterialDefinitionSchema = {
       content: 'hello world',
     },
   },
+  fields: [
+    {
+      key: 'props.content',
+      label: '内容',
+      type: 'input',
+    },
+    {
+      key: 'style.color',
+      label: '颜色',
+      type: 'color',
+    },
+    {
+      key: 'style.fontSize',
+      label: '字号',
+      type: 'number',
+    },
+  ],
 }
