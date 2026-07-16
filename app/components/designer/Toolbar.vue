@@ -34,6 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useKeyboard } from '~/composables/keyboard'
 import { useUndoRedo } from '~/composables/undo-redo'
 
 const props = defineProps<{
@@ -88,6 +89,19 @@ function downloadPageConfig() {
 }
 
 const { canUndo, canRedo, undo, redo } = useUndoRedo()
+const { registerShortcut } = useKeyboard()
+
+registerShortcut({
+  keys: ['Mod+Z'],
+  enabled: () => canUndo.value,
+  execute: () => undo(),
+})
+
+registerShortcut({
+  keys: ['Mod+Shift+Z', 'Mod+Y'],
+  enabled: () => canRedo.value,
+  execute: () => redo(),
+})
 </script>
 
 <template>
