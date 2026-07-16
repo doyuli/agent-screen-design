@@ -1,14 +1,14 @@
 import { useEventListener } from '@vueuse/core'
 import { onScopeDispose } from 'vue'
 
-interface Shortcut {
-  match: (event: KeyboardEvent) => boolean
+export interface ShortcutOptions {
+  keys: string[]
   enabled?: () => boolean
   execute: () => void
 }
 
-interface ShortcutOptions extends Omit<Shortcut, 'match'> {
-  keys: string[]
+interface Shortcut extends Omit<ShortcutOptions, 'keys'> {
+  match: (event: KeyboardEvent) => boolean
 }
 
 type ModifierKey = 'alt' | 'ctrl' | 'meta' | 'shift'
@@ -22,9 +22,7 @@ const modifierKeys = new Set<ModifierKey>(['alt', 'ctrl', 'meta', 'shift'])
 
 const shortcuts = new Set<Shortcut>()
 
-function isMacOS() {
-  return typeof navigator !== 'undefined' && /mac/i.test(navigator.platform || navigator.userAgent)
-}
+const isMacOS = typeof navigator !== 'undefined' && /mac/i.test(navigator.platform || navigator.userAgent)
 
 function parseKeyCombination(keys: string): KeyCombination | undefined {
   const modifiers = new Set<ModifierKey>()
@@ -36,10 +34,8 @@ function parseKeyCombination(keys: string): KeyCombination | undefined {
     .map(key => key.trim())
     .filter(Boolean)
 
-  const isMac = isMacOS()
-
   for (const keyPart of keyParts) {
-    const modifier = keyPart === 'mod' ? (isMac ? 'meta' : 'ctrl') : keyPart
+    const modifier = keyPart === 'mod' ? (isMacOS ? 'meta' : 'ctrl') : keyPart
 
     if (modifierKeys.has(modifier as ModifierKey))
       modifiers.add(modifier as ModifierKey)
@@ -65,7 +61,7 @@ function isEditableTarget(target: EventTarget | null) {
 }
 
 export function useKeyboard() {
-  function registerShortcut({ keys, ...shortcut }: ShortcutOptions) {
+  function register({ keys, ...shortcut }: ShortcutOptions) {
     const combinations = keys.map(parseKeyCombination).filter((key): key is KeyCombination => Boolean(key))
     const registeredShortcut: Shortcut = {
       ...shortcut,
@@ -74,9 +70,21 @@ export function useKeyboard() {
 
     shortcuts.add(registeredShortcut)
 
-    onScopeDispose(() => {
+    const unregister = () => {
       shortcuts.delete(registeredShortcut)
-    })
+    }
+    onScopeDispose(unregister)
+
+    return unregister
+  }
+
+  function registerShortcut(shortcuts: ShortcutOptions[] | ShortcutOptions) {
+    if (Array.isArray(shortcuts)) {
+      const unregisters = shortcuts.map(register)
+      return () => unregisters.forEach(unregister => unregister())
+    }
+
+    return register(shortcuts)
   }
 
   useEventListener(
