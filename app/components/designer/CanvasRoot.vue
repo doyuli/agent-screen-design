@@ -30,7 +30,7 @@ const {
   onZoomChange,
 } = useCanvasRuler({ canvasRootRef: canvasRoot, moveableRef })
 
-const { onDrag, onResize, onDragGroup, onResizeGroup } = useMoveable(moveableRef)
+const { onDrag, onResize, onDragGroup, onResizeGroup, onStart, onEnd } = useMoveable(moveableRef)
 const { onSelect, onClearSelected, onSelectEnd, selectedTarget } = useSelection({ stageRef, moveableRef })
 
 watch(canvasScale, (scale) => {
@@ -141,6 +141,14 @@ const { getCommands } = useCommands()
         @resize="onResize"
         @drag-group="onDragGroup"
         @resize-group="onResizeGroup"
+        @drag-start="onStart"
+        @resize-start="onStart"
+        @drag-group-start="onStart"
+        @resize-group-start="onStart"
+        @drag-end="onEnd"
+        @drag-group-end="onEnd"
+        @resize-end="onEnd"
+        @resize-group-end="onEnd"
       />
     </div>
   </section>

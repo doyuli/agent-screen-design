@@ -28,7 +28,7 @@ function updateColor(value: string) {
         :value="modelValue"
         class="absolute inset-0 size-full cursor-pointer opacity-0"
         aria-label="选择颜色"
-        @input="updateColor(($event.target as HTMLInputElement).value)"
+        @change="updateColor(($event.target as HTMLInputElement).value)"
       >
     </div>
 

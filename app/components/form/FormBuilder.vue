@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import type { FieldSchema, MaterialSchema } from '~~/shared/schema/material'
 import { Label } from '@/components/ui/label'
+import { useUndoRedo } from '~/composables/undo-redo'
+import { getValue } from '~/utils'
 import { getComponent } from './register'
-import { getValue, setValue } from './utils'
 
 defineProps<{
   fields: FieldSchema[]
   formData: MaterialSchema
 }>()
+
+const { startBatch, commitBatch, applyChange } = useUndoRedo()
 
 function getGridColumn(span?: number) {
   const columnSpan = span || 24
@@ -39,9 +42,11 @@ function shouldWithBackground(field: FieldSchema) {
         :id="field.key"
         v-bind="field.props"
         :model-value="getValue(formData, field.key)"
-        @update:model-value="(val: any) => {
-          setValue(formData, field.key, val)
+        @update:model-value="(val: unknown) => {
+          applyChange(formData, field.key, val)
         }"
+        @focus="startBatch"
+        @blur="commitBatch"
       />
     </div>
   </div>

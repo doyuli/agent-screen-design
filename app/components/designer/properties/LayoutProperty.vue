@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { updateDimension } from '~/utils/dimension'
+import { useUndoRedo } from '~/composables/undo-redo'
+import { getDimensionChanges } from '~/utils/dimension'
 
 const editorStore = useEditorStore()
 const { selectedNode } = storeToRefs(editorStore)
 
 const selectedNodeLayout = computed(() => selectedNode.value!.layout)
+
+const { startBatch, commitBatch, applyChange } = useUndoRedo()
 
 function createPositionRef(dimension: 'x' | 'y') {
   return computed({
@@ -14,7 +17,7 @@ function createPositionRef(dimension: 'x' | 'y') {
       const layout = selectedNodeLayout.value
 
       if (layout && Number.isFinite(position))
-        layout[dimension] = Math.round(position)
+        applyChange(layout, dimension, Math.round(position))
     },
   })
 }
@@ -22,22 +25,25 @@ function createPositionRef(dimension: 'x' | 'y') {
 const x = createPositionRef('x')
 const y = createPositionRef('y')
 
+function applyLayoutDimension(dimension: RatioDimension, value: number) {
+  const node = selectedNode.value
+  if (!node)
+    return
+
+  const changes = getDimensionChanges(node.layout, dimension, value, node.layout.lockRatio)
+
+  if (changes)
+    applyChange(node, 'layout', { ...node.layout, ...changes })
+}
+
 const width = computed({
   get: () => selectedNodeLayout.value.width,
-  set: (value) => {
-    const layout = selectedNodeLayout.value
-    if (layout)
-      updateDimension(layout, 'width', value, layout.lockRatio)
-  },
+  set: value => applyLayoutDimension('width', value),
 })
 
 const height = computed({
   get: () => selectedNodeLayout.value.height,
-  set: (value) => {
-    const layout = selectedNodeLayout.value
-    if (layout)
-      updateDimension(layout, 'height', value, layout.lockRatio)
-  },
+  set: value => applyLayoutDimension('height', value),
 })
 </script>
 
@@ -49,6 +55,8 @@ const height = computed({
         id="x"
         v-model="x"
         type="number"
+        @focus="startBatch"
+        @blur="commitBatch"
       />
     </div>
     <div class="space-y-2">
@@ -57,6 +65,8 @@ const height = computed({
         id="y"
         v-model="y"
         type="number"
+        @focus="startBatch"
+        @blur="commitBatch"
       />
     </div>
     <div class="space-y-2">
@@ -65,6 +75,8 @@ const height = computed({
         id="width"
         v-model="width"
         type="number"
+        @focus="startBatch"
+        @blur="commitBatch"
       />
     </div>
     <div class="space-y-2">
@@ -73,11 +85,17 @@ const height = computed({
         id="height"
         v-model="height"
         type="number"
+        @focus="startBatch"
+        @blur="commitBatch"
       />
     </div>
   </div>
   <div class="flex items-center justify-between rounded-md border bg-background px-3 py-2">
     <Label for="lock-ratio" class="text-sm">锁定比例</Label>
-    <Switch id="lock-ratio" v-model="selectedNodeLayout.lockRatio" />
+    <Switch
+      id="lock-ratio"
+      :model-value="selectedNodeLayout.lockRatio"
+      @update:model-value="(value) => applyChange(selectedNodeLayout, 'lockRatio', value)"
+    />
   </div>
 </template>

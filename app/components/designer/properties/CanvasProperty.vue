@@ -2,7 +2,8 @@
 import type { RatioDimension } from '~/utils/dimension'
 import { ColorPicker } from '@/components/ui/color'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { updateDimension } from '~/utils/dimension'
+import { useUndoRedo } from '~/composables/undo-redo'
+import { getDimensionChanges } from '~/utils/dimension'
 
 const editorStore = useEditorStore()
 const { pageSchema, canvas } = storeToRefs(editorStore)
@@ -12,6 +13,7 @@ const drafts = reactive({
   height: canvas.value.height,
 })
 const lockRatio = ref(false)
+const { applyChange } = useUndoRedo()
 
 function resetDrafts() {
   drafts.width = canvas.value.width
@@ -20,8 +22,12 @@ function resetDrafts() {
 
 function commitDimension(dimension: RatioDimension) {
   const value = drafts[dimension]
-  if (value > 0)
-    updateDimension(canvas.value, dimension, value, lockRatio.value)
+  if (value > 0) {
+    const changes = getDimensionChanges(canvas.value, dimension, value, lockRatio.value)
+
+    if (changes)
+      applyChange(pageSchema.value, 'canvas', { ...canvas.value, ...changes })
+  }
 
   resetDrafts()
 }

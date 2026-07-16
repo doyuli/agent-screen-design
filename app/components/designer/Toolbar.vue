@@ -34,6 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useUndoRedo } from '~/composables/undo-redo'
 
 const props = defineProps<{
   materialCollapsed: boolean
@@ -85,6 +86,8 @@ function downloadPageConfig() {
   link.click()
   URL.revokeObjectURL(url)
 }
+
+const { canUndo, canRedo, undo, redo } = useUndoRedo()
 </script>
 
 <template>
@@ -146,7 +149,7 @@ function downloadPageConfig() {
         <div class="hidden items-center gap-1 md:flex">
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="ghost" size="icon-sm" :disabled="!canUndo" @click="undo">
                 <Undo2 class="size-4" aria-hidden="true" />
                 <span class="sr-only">撤销</span>
               </Button>
@@ -155,7 +158,7 @@ function downloadPageConfig() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="ghost" size="icon-sm">
+              <Button variant="ghost" size="icon-sm" :disabled="!canRedo" @click="redo">
                 <Redo2 class="size-4" aria-hidden="true" />
                 <span class="sr-only">重做</span>
               </Button>

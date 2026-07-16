@@ -5,7 +5,7 @@ export interface DimensionTarget {
   height: number
 }
 
-export function updateDimension(
+export function getDimensionChanges(
   target: DimensionTarget,
   dimension: RatioDimension,
   value: number,
@@ -13,17 +13,22 @@ export function updateDimension(
 ) {
   const nextValue = Number(value)
 
-  if (!Number.isFinite(nextValue))
-    return
+  if (!Number.isFinite(nextValue) || target[dimension] === nextValue)
+    return null
 
   const aspectRatio = target.width / target.height
-  target[dimension] = nextValue
+  const changes: Partial<DimensionTarget> = { [dimension]: nextValue }
 
   if (!lockRatio || !Number.isFinite(aspectRatio) || aspectRatio <= 0)
-    return
+    return changes
 
   const pairedDimension = dimension === 'width' ? 'height' : 'width'
-  target[pairedDimension] = Math.round(
+  const pairedValue = Math.round(
     dimension === 'width' ? nextValue / aspectRatio : nextValue * aspectRatio,
   )
+
+  if (target[pairedDimension] !== pairedValue)
+    changes[pairedDimension] = pairedValue
+
+  return changes
 }

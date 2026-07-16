@@ -2,10 +2,13 @@ import type { TemplateRef } from 'vue'
 import type { OnDrag, OnDragGroup, OnResize, OnResizeGroup } from 'vue3-moveable'
 import type Moveable from 'vue3-moveable'
 import { ATTR_NODE_ID } from '~/constants'
+import { useUndoRedo } from './undo-redo'
 
 export function useMoveable(moveableRef: TemplateRef<Moveable>) {
   const editorStore = useEditorStore()
   const { nodes } = storeToRefs(editorStore)
+
+  const { startBatch, commitBatch, applyChange } = useUndoRedo()
 
   function getNodeByTarget(target: HTMLElement) {
     const id = target.getAttribute(ATTR_NODE_ID)
@@ -14,14 +17,21 @@ export function useMoveable(moveableRef: TemplateRef<Moveable>) {
     return null
   }
 
+  function onStart() {
+    startBatch()
+  }
+
+  function onEnd() {
+    commitBatch()
+  }
+
   function onDrag(e: OnDrag) {
     e.target.style.left = `${e.left}px`
     e.target.style.top = `${e.top}px`
 
     const node = getNodeByTarget(e.target as HTMLElement)
     if (node) {
-      node.layout.x = e.left
-      node.layout.y = e.top
+      applyChange(node, 'layout', { ...node.layout, x: e.left, y: e.top })
     }
   }
 
@@ -31,8 +41,7 @@ export function useMoveable(moveableRef: TemplateRef<Moveable>) {
 
     const node = getNodeByTarget(e.target as HTMLElement)
     if (node) {
-      node.layout.width = e.width
-      node.layout.height = e.height
+      applyChange(node, 'layout', { ...node.layout, width: e.width, height: e.height })
     }
 
     onDrag(e.drag)
@@ -53,6 +62,8 @@ export function useMoveable(moveableRef: TemplateRef<Moveable>) {
   )
 
   return {
+    onStart,
+    onEnd,
     onDrag,
     onResize,
     onDragGroup,
