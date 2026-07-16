@@ -107,7 +107,7 @@ const { getCommands } = useCommands()
               </div>
             </ContextMenuTrigger>
             <ContextMenuContent class="min-w-0">
-              <ContextMenuItem v-for="command in getCommands(node)" :key="command.key" @click="command.onClick(node)">
+              <ContextMenuItem v-for="command in getCommands(node, index)" :key="command.key" @select="command.execute(node)">
                 {{ typeof command.label === 'function' ? command.label(node) : command.label }}
               </ContextMenuItem>
             </ContextMenuContent>

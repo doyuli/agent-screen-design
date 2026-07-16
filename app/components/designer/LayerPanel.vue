@@ -33,7 +33,7 @@ const { getCommands } = useCommands()
 
     <ScrollArea class="min-h-0 flex-1">
       <div ref="layer-panel" class="p-2 flex flex-col-reverse gap-1 justify-start">
-        <ContextMenu v-for="node in nodes" :key="node.id">
+        <ContextMenu v-for="(node, index) in nodes" :key="node.id">
           <ContextMenuTrigger>
             <button
               :data-active="selectedNodeIds.includes(node.id)"
@@ -54,7 +54,7 @@ const { getCommands } = useCommands()
             </button>
           </ContextMenuTrigger>
           <ContextMenuContent class="min-w-0">
-            <ContextMenuItem v-for="command in getCommands(node)" :key="command.key" @click="command.onClick(node)">
+            <ContextMenuItem v-for="command in getCommands(node, index)" :key="command.key" @select="command.execute(node)">
               {{ typeof command.label === 'function' ? command.label(node) : command.label }}
             </ContextMenuItem>
           </ContextMenuContent>
