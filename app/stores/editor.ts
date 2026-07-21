@@ -1,6 +1,7 @@
 import type { MaterialSchema } from '~~/shared/schema/material'
 import type { PageSchema } from '~~/shared/schema/page'
 import { defineStore } from 'pinia'
+import { useUndoRedo } from '~/composables/undo-redo'
 import { deepClone } from '~/utils'
 
 export const useEditorStore = defineStore('editor', () => {
@@ -21,20 +22,32 @@ export const useEditorStore = defineStore('editor', () => {
     nodes: [],
   })
 
-  const nodes = toRef(pageSchema.value, 'nodes')
-  const canvas = toRef(pageSchema.value, 'canvas')
+  const nodes = computed({
+    get: () => pageSchema.value.nodes,
+    set: value => (pageSchema.value.nodes = value),
+  })
+  const canvas = computed({
+    get: () => pageSchema.value.canvas,
+    set: value => (pageSchema.value.canvas = value),
+  })
   const canvasScale = ref(1)
 
   const selectedNodeIds = ref<string[]>([])
   const selectedNodeId = computed(() => selectedNodeIds.value.length === 1 ? selectedNodeIds.value[0] : null)
   const selectedNode = computed(() => nodes.value.find(node => node.id === selectedNodeId.value))
 
+  const { applyChange } = useUndoRedo()
+
   function stepCanvasScale(step: number) {
     canvasScale.value += step
   }
 
+  function replaceNodes(value: MaterialSchema[]) {
+    applyChange(pageSchema.value, 'nodes', value)
+  }
+
   function addNode(node: MaterialSchema) {
-    nodes.value.push(node)
+    replaceNodes([...nodes.value, node])
   }
 
   function findNodeById(id: string) {
@@ -54,7 +67,7 @@ export const useEditorStore = defineStore('editor', () => {
   }
 
   function toggleNodeLock(node: MaterialSchema) {
-    node.locked = !node.locked
+    applyChange(node, 'locked', !node.locked)
     if (node.locked)
       clearSelectedNode()
   }
@@ -69,18 +82,18 @@ export const useEditorStore = defineStore('editor', () => {
   }
 
   function removeNode(node: MaterialSchema) {
-    nodes.value = nodes.value.filter(n => n.id !== node.id)
+    replaceNodes(nodes.value.filter(n => n.id !== node.id))
     selectedNodeIds.value = selectedNodeIds.value.filter(id => id !== node.id)
   }
 
   function moveNodeToTop(node: MaterialSchema) {
-    nodes.value = nodes.value.filter(n => n.id !== node.id)
-    nodes.value.push(node)
+    const filteredNodes = nodes.value.filter(n => n.id !== node.id)
+    replaceNodes([...filteredNodes, node])
   }
 
   function moveNodeToBottom(node: MaterialSchema) {
-    nodes.value = nodes.value.filter(n => n.id !== node.id)
-    nodes.value.unshift(node)
+    const filteredNodes = nodes.value.filter(n => n.id !== node.id)
+    replaceNodes([node, ...filteredNodes])
   }
 
   return {
