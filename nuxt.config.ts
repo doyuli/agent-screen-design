@@ -19,6 +19,7 @@ export default defineNuxtConfig({
       tailwindcss(),
     ],
   },
+  ssr: false,
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 })
