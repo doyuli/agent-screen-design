@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { MaterialSchema } from '~~/shared/schema/material'
-import { Check, Copy } from '@lucide/vue'
+import { Check, Copy, Save } from '@lucide/vue'
+import { useClipboard } from '@vueuse/core'
+import { toast } from 'vue-sonner'
+import { materialSchema } from '~~/shared/schema/material'
+import MonacoEditor from '@/components/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 
@@ -8,26 +12,45 @@ const props = defineProps<{
   node: MaterialSchema | undefined
 }>()
 
-const open = defineModel<boolean>('open', { default: false })
-const copyState = ref<'idle' | 'copied' | 'failed'>('idle')
-const formattedNodeConfig = computed(() => JSON.stringify(props.node, null, 2) || '{}')
+const emit = defineEmits<{
+  save: [node: MaterialSchema]
+}>()
 
-watch(open, (isOpen) => {
-  if (isOpen)
-    copyState.value = 'idle'
+const open = defineModel<boolean>('open', { default: false })
+const formattedNodeConfig = ref('{}')
+
+const { copy, copied } = useClipboard({
+  source: formattedNodeConfig,
+  legacy: true,
 })
 
-function copyNodeConfig() {
-  const textArea = document.createElement('textarea')
+watch(open, (isOpen) => {
+  if (!isOpen)
+    return
 
-  textArea.value = formattedNodeConfig.value
-  textArea.setAttribute('readonly', '')
-  textArea.style.position = 'fixed'
-  textArea.style.opacity = '0'
-  document.body.append(textArea)
-  textArea.select()
-  copyState.value = document.execCommand('copy') ? 'copied' : 'failed'
-  textArea.remove()
+  formattedNodeConfig.value = JSON.stringify(props.node, null, 2) || '{}'
+})
+
+function saveNodeConfig() {
+  let parsedConfig: unknown
+
+  try {
+    parsedConfig = JSON.parse(formattedNodeConfig.value)
+  }
+  catch {
+    toast.error('JSON 格式有误，请检查后重试')
+    return
+  }
+
+  const result = materialSchema.safeParse(parsedConfig)
+
+  if (!result.success) {
+    toast.error(result.error.issues[0]?.message ?? '节点配置不符合 Schema 要求')
+    return
+  }
+
+  emit('save', result.data)
+  open.value = false
 }
 </script>
 
@@ -36,22 +59,25 @@ function copyNodeConfig() {
     <SheetContent side="right" class="w-[min(32rem,calc(100vw-1rem))] gap-0 p-0 sm:max-w-none">
       <SheetHeader class="border-b pr-12">
         <SheetTitle>节点 JSON</SheetTitle>
-        <SheetDescription>当前节点的只读配置</SheetDescription>
+        <SheetDescription>编辑当前节点的 JSON 配置</SheetDescription>
       </SheetHeader>
 
-      <div class="min-h-0 flex-1 overflow-auto bg-muted/30 p-4">
-        <pre class="min-h-full whitespace-pre-wrap wrap-break-word rounded-md border bg-background p-3 font-mono text-xs leading-5 text-foreground"><code>{{ formattedNodeConfig }}</code></pre>
+      <div class="min-h-0 flex-1 overflow-auto bg-muted/30 py-2">
+        <MonacoEditor v-model="formattedNodeConfig" />
       </div>
 
       <SheetFooter class="flex-row justify-between border-t sm:justify-between">
-        <span v-if="copyState === 'copied'" class="text-xs text-muted-foreground">已复制到剪贴板</span>
-        <span v-else-if="copyState === 'failed'" class="text-xs text-destructive">复制失败，请重试</span>
-        <span v-else class="text-xs text-muted-foreground">只读配置</span>
-        <Button size="sm" @click="copyNodeConfig">
-          <Check v-if="copyState === 'copied'" class="size-4" aria-hidden="true" />
-          <Copy v-else class="size-4" aria-hidden="true" />
-          复制
-        </Button>
+        <span class="text-xs text-muted-foreground">{{ copied ? '已复制到剪贴板' : '编辑后点击保存以应用更改' }}</span>
+        <div class="flex items-center gap-2">
+          <Button variant="outline" size="sm" @click="copy()">
+            <component :is="copied ? Check : Copy" class="size-4" aria-hidden="true" />
+            复制
+          </Button>
+          <Button size="sm" @click="saveNodeConfig">
+            <Save class="size-4" aria-hidden="true" />
+            保存
+          </Button>
+        </div>
       </SheetFooter>
     </SheetContent>
   </Sheet>

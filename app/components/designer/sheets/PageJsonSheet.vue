@@ -8,26 +8,12 @@ const props = defineProps<{
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
-const copyState = ref<'idle' | 'copied' | 'failed'>('idle')
 const formattedPageConfig = computed(() => props.pageJson || '{}')
 
-watch(open, (isOpen) => {
-  if (isOpen)
-    copyState.value = 'idle'
+const { copy, copied } = useClipboard({
+  source: formattedPageConfig,
+  legacy: true,
 })
-
-function copyPageConfig() {
-  const textArea = document.createElement('textarea')
-
-  textArea.value = formattedPageConfig.value
-  textArea.setAttribute('readonly', '')
-  textArea.style.position = 'fixed'
-  textArea.style.opacity = '0'
-  document.body.append(textArea)
-  textArea.select()
-  copyState.value = document.execCommand('copy') ? 'copied' : 'failed'
-  textArea.remove()
-}
 
 function downloadPageConfig() {
   const blob = new Blob([formattedPageConfig.value], { type: 'application/json' })
@@ -54,17 +40,14 @@ function downloadPageConfig() {
       </div>
 
       <SheetFooter class="flex-row justify-between border-t sm:justify-between">
-        <span v-if="copyState === 'copied'" class="text-xs text-muted-foreground">已复制到剪贴板</span>
-        <span v-else-if="copyState === 'failed'" class="text-xs text-destructive">复制失败，请重试</span>
-        <span v-else class="text-xs text-muted-foreground">只读配置</span>
+        <span class="text-xs text-muted-foreground">{{ copied ? '已复制到剪贴板' : '只读配置' }}</span>
         <div class="flex items-center gap-2">
           <Button variant="outline" size="sm" @click="downloadPageConfig">
             <Download class="size-4" aria-hidden="true" />
             下载
           </Button>
-          <Button size="sm" @click="copyPageConfig">
-            <Check v-if="copyState === 'copied'" class="size-4" aria-hidden="true" />
-            <Copy v-else class="size-4" aria-hidden="true" />
+          <Button size="sm" @click="copy()">
+            <component :is="copied ? Check : Copy" class="size-4" aria-hidden="true" />
             复制
           </Button>
         </div>

@@ -5,30 +5,20 @@ import MaterialPanel from '@/components/designer/MaterialPanel.vue'
 import PropertyPanel from '@/components/designer/PropertyPanel.vue'
 import Toolbar from '@/components/designer/Toolbar.vue'
 
-const { panelCollapsed } = useEditorStore()
+const editorStore = useEditorStore()
+const { pageSchema, panelCollapsed } = storeToRefs(editorStore)
 
-const pageConfig = {
-  id: 'city-operations-home',
-  name: '城市运营大屏 / 首页',
-  viewport: {
-    width: 1920,
-    height: 1080,
-  },
-  components: [
-    { id: 'metric-summary', type: 'MetricCards', name: '运营指标' },
-    { id: 'transaction-trend', type: 'LineChart', name: '实时交易趋势' },
-    { id: 'regional-map', type: 'Map', name: '区域分布' },
-    { id: 'event-stream', type: 'EventList', name: '事件流' },
-  ],
-}
-const pageJson = JSON.stringify(pageConfig, null, 2)
+const pageJson = computed(() => JSON.stringify(pageSchema.value, null, 2))
 
-const layoutColumns = computed(() => [
-  panelCollapsed.material ? '0px' : '240px',
-  panelCollapsed.layer ? '0px' : '198px',
-  'minmax(0, 1fr)',
-  panelCollapsed.property ? '0px' : '320px',
-].join(' '))
+const layoutColumns = computed(() => {
+  const { material, layer, property } = panelCollapsed.value
+  return [
+    material ? '0px' : '240px',
+    layer ? '0px' : '198px',
+    'minmax(0, 1fr)',
+    property ? '0px' : '320px',
+  ].join(' ')
+})
 </script>
 
 <template>

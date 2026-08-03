@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import type { MaterialSchema } from '~~/shared/schema/material'
 import { Braces, Zap } from '@lucide/vue'
+import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import CanvasProperty from './properties/CanvasProperty.vue'
@@ -13,6 +15,19 @@ const { selectedNode, pageSchema } = storeToRefs(editorStore)
 const currentNode = computed(() => selectedNode.value ?? pageSchema.value)
 const nodeJsonOpen = ref(false)
 const eventConfigOpen = ref(false)
+
+function saveNodeJson(node: MaterialSchema) {
+  const selectedNodeValue = selectedNode.value
+  if (!selectedNodeValue)
+    return
+
+  editorStore.replaceNodes(pageSchema.value.nodes.map(item => item === selectedNodeValue ? node : item))
+
+  if (node.id !== selectedNodeValue.id)
+    editorStore.selectNodeById(node.id)
+
+  toast.success('节点配置已保存')
+}
 </script>
 
 <template>
@@ -58,7 +73,7 @@ const eventConfigOpen = ref(false)
     <CanvasProperty v-if="currentNode.type === 'page'" />
     <NodeProperty v-else />
 
-    <NodeJsonSheet v-model:open="nodeJsonOpen" :node="selectedNode" />
+    <NodeJsonSheet v-model:open="nodeJsonOpen" :node="selectedNode" @save="saveNodeJson" />
     <EventConfigSheet v-model:open="eventConfigOpen" />
   </aside>
 </template>

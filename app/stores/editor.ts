@@ -106,6 +106,7 @@ export const useEditorStore = defineStore('editor', () => {
     selectedNodeIds,
     selectedNode,
     findNodeById,
+    replaceNodes,
     addNode,
     copyNode,
     removeNode,
