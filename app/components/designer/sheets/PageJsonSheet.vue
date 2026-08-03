@@ -21,7 +21,7 @@ function downloadPageConfig() {
   const link = document.createElement('a')
 
   link.href = url
-  link.download = 'city-operations-home.json'
+  link.download = 'screen-design.json'
   link.click()
   URL.revokeObjectURL(url)
 }

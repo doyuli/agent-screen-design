@@ -6,9 +6,7 @@ import PropertyPanel from '@/components/designer/PropertyPanel.vue'
 import Toolbar from '@/components/designer/Toolbar.vue'
 
 const editorStore = useEditorStore()
-const { pageSchema, panelCollapsed } = storeToRefs(editorStore)
-
-const pageJson = computed(() => JSON.stringify(pageSchema.value, null, 2))
+const { panelCollapsed } = storeToRefs(editorStore)
 
 const layoutColumns = computed(() => {
   const { material, layer, property } = panelCollapsed.value
@@ -27,7 +25,6 @@ const layoutColumns = computed(() => {
       :material-collapsed="panelCollapsed.material"
       :layer-collapsed="panelCollapsed.layer"
       :property-collapsed="panelCollapsed.property"
-      :page-json="pageJson"
       @toggle-material="panelCollapsed.material = !panelCollapsed.material"
       @toggle-layer="panelCollapsed.layer = !panelCollapsed.layer"
       @toggle-property="panelCollapsed.property = !panelCollapsed.property"

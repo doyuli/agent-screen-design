@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import { Braces, Eye, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
+import { Braces, Eye, FileInput, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
 import { computed, ref } from 'vue'
+import { toast } from 'vue-sonner'
+import { pageSchema as pageSchemaType } from '~~/shared/schema/page'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useKeyboard } from '~/composables/keyboard'
 import { useUndoRedo } from '~/composables/undo-redo'
+import { safeJsonParse } from '~/utils'
 import PageJsonSheet from './sheets/PageJsonSheet.vue'
 
 defineProps<{
   materialCollapsed: boolean
   layerCollapsed: boolean
   propertyCollapsed: boolean
-  pageJson: string
 }>()
 
 defineEmits<{
@@ -28,6 +30,8 @@ const editorStore = useEditorStore()
 const { pageSchema, canvasScale, canvas } = storeToRefs(editorStore)
 
 const canvasScalePercentage = computed(() => Math.round(canvasScale.value * 100))
+
+const pageJson = computed(() => JSON.stringify(pageSchema.value, null, 2))
 
 const { canUndo, canRedo, undo, redo } = useUndoRedo()
 const { registerShortcut } = useKeyboard()
@@ -44,6 +48,44 @@ registerShortcut([
     execute: () => redo(),
   },
 ])
+
+const fileInput = useTemplateRef<HTMLInputElement>('file-input')
+
+function importPageConfig() {
+  fileInput.value?.click()
+}
+
+async function handleFileChange(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+
+  if (!file)
+    return
+
+  let json: string
+  try {
+    json = await file.text()
+  }
+  catch {
+    toast.error('文件读取失败，请重试')
+    return
+  }
+
+  const parsedConfig = safeJsonParse(json)
+
+  if (!parsedConfig) {
+    toast.error('JSON 格式有误，请检查后重试')
+    return
+  }
+
+  const result = pageSchemaType.safeParse(parsedConfig)
+
+  if (!result.success) {
+    toast.error(result.error.issues[0]?.message ?? '配置不符合 Schema 要求')
+    return
+  }
+
+  editorStore.setPageSchema(result.data)
+}
 </script>
 
 <template>
@@ -156,6 +198,17 @@ registerShortcut([
     </div>
 
     <div class="flex items-center gap-2">
+      <Tooltip>
+        <TooltipTrigger as-child>
+          <Button variant="ghost" size="icon-sm" @click="importPageConfig">
+            <FileInput class="size-4" aria-hidden="true" />
+            <span class="sr-only">导入配置</span>
+          </Button>
+          <input ref="file-input" class="hidden" type="file" accept="application/json" @change="handleFileChange">
+        </TooltipTrigger>
+        <TooltipContent>导入配置</TooltipContent>
+      </Tooltip>
+
       <Tooltip>
         <TooltipTrigger as-child>
           <Button variant="ghost" size="icon-sm" @click="jsonOpen = true">

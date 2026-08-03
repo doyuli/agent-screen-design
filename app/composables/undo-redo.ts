@@ -95,6 +95,12 @@ export function useUndoRedo() {
     pushUndoBatch(batch)
   }
 
+  function clearUndoRedoStack() {
+    undoStack.length = 0
+    redoStack.length = 0
+    activeBatch = null
+  }
+
   return {
     canRedo,
     canUndo,
@@ -103,5 +109,6 @@ export function useUndoRedo() {
     applyChange,
     undo,
     redo,
+    clearUndoRedoStack,
   }
 }

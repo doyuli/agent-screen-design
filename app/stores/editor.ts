@@ -36,7 +36,7 @@ export const useEditorStore = defineStore('editor', () => {
   const selectedNodeId = computed(() => selectedNodeIds.value.length === 1 ? selectedNodeIds.value[0] : null)
   const selectedNode = computed(() => nodes.value.find(node => node.id === selectedNodeId.value))
 
-  const { applyChange } = useUndoRedo()
+  const { applyChange, clearUndoRedoStack } = useUndoRedo()
 
   function stepCanvasScale(step: number) {
     canvasScale.value += step
@@ -96,6 +96,12 @@ export const useEditorStore = defineStore('editor', () => {
     replaceNodes([node, ...filteredNodes])
   }
 
+  function setPageSchema(schema: PageSchema) {
+    pageSchema.value = schema
+    clearUndoRedoStack()
+    clearSelectedNode()
+  }
+
   return {
     panelCollapsed,
     pageSchema,
@@ -117,5 +123,6 @@ export const useEditorStore = defineStore('editor', () => {
     clearSelectedNode,
     toggleNodeLock,
     stepCanvasScale,
+    setPageSchema,
   }
 })

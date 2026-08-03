@@ -7,6 +7,7 @@ import { materialSchema } from '~~/shared/schema/material'
 import MonacoEditor from '@/components/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { safeJsonParse } from '~/utils'
 
 const props = defineProps<{
   node: MaterialSchema | undefined
@@ -32,12 +33,9 @@ watch(open, (isOpen) => {
 })
 
 function saveNodeConfig() {
-  let parsedConfig: unknown
+  const parsedConfig = safeJsonParse(formattedNodeConfig.value)
 
-  try {
-    parsedConfig = JSON.parse(formattedNodeConfig.value)
-  }
-  catch {
+  if (!parsedConfig) {
     toast.error('JSON 格式有误，请检查后重试')
     return
   }
