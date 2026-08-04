@@ -23,6 +23,8 @@ export function useDataSource(dataSourceId: Ref<string | undefined>) {
   let disposed = false
 
   async function loadData() {
+    clearTimer()
+
     const version = ++requestVersion
     const currentSource = source.value
     if (!currentSource) {
@@ -72,10 +74,7 @@ export function useDataSource(dataSourceId: Ref<string | undefined>) {
     timer = undefined
   }
 
-  watch([dataSourceId, dataSources], () => {
-    clearTimer()
-    loadData()
-  }, { immediate: true })
+  watch([dataSourceId, dataSources], loadData, { immediate: true })
 
   onBeforeUnmount(() => {
     disposed = true
