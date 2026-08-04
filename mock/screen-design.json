@@ -1,0 +1,333 @@
+{
+  "name": "城市运营大屏",
+  "type": "page",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "backgroundColor": "#07111f"
+  },
+  "nodes": [
+    {
+      "id": "17ffdcf9-c86a-43fc-b1a9-bcd77cb6ef41",
+      "name": "普通文本",
+      "description": "基础",
+      "locked": false,
+      "type": "text",
+      "layout": {
+        "x": 607.7479894,
+        "y": 517.2913316,
+        "width": 300,
+        "height": 50,
+        "lockRatio": false
+      },
+      "style": {
+        "color": "#fff",
+        "fontSize": 16
+      },
+      "props": {
+        "content": "hello world"
+      }
+    },
+    {
+      "id": "d33a8e67-c1d6-4d9b-8254-043b3471d9eb",
+      "name": "柱状图",
+      "description": "图表",
+      "type": "bar-chart",
+      "layout": {
+        "x": 620,
+        "y": 146,
+        "width": 400,
+        "height": 260,
+        "lockRatio": false
+      },
+      "props": {
+        "option": {
+          "legend": {
+            "top": 38,
+            "left": "center",
+            "itemWidth": 12,
+            "itemHeight": 8,
+            "show": true,
+            "textStyle": {
+              "color": "#cbd5e1"
+            }
+          },
+          "title": {
+            "text": "销售额统计",
+            "top": 8,
+            "left": "center",
+            "textStyle": {
+              "color": "#ffffff",
+              "fontSize": 16
+            }
+          },
+          "tooltip": {},
+          "dataset": {
+            "source": [
+              {
+                "month": "一月",
+                "sales": 120
+              },
+              {
+                "month": "二月",
+                "sales": 200
+              },
+              {
+                "month": "三月",
+                "sales": 150
+              },
+              {
+                "month": "四月",
+                "sales": 80
+              },
+              {
+                "month": "五月",
+                "sales": 170
+              },
+              {
+                "month": "六月",
+                "sales": 240
+              }
+            ]
+          },
+          "grid": {
+            "top": 86,
+            "right": 24,
+            "bottom": 32,
+            "left": 48,
+            "containLabel": true
+          },
+          "xAxis": {
+            "type": "category",
+            "axisLine": {
+              "lineStyle": {
+                "color": "#64748b"
+              }
+            },
+            "axisLabel": {
+              "color": "#cbd5e1"
+            }
+          },
+          "yAxis": {
+            "type": "value",
+            "axisLabel": {
+              "color": "#cbd5e1"
+            },
+            "splitLine": {
+              "lineStyle": {
+                "color": "rgba(148, 163, 184, 0.18)"
+              }
+            }
+          },
+          "series": [
+            {
+              "name": "销售额",
+              "type": "bar",
+              "barWidth": "45%",
+              "encode": {
+                "x": "month",
+                "y": "sales"
+              },
+              "itemStyle": {
+                "color": "#22d3ee",
+                "borderRadius": [
+                  4,
+                  4,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "dataSourceId": "39cf6b87-8ee6-4331-94e3-2674bc624146"
+    },
+    {
+      "id": "2e95046e-d5c0-481f-8f3d-2390228b450b",
+      "name": "柱状图",
+      "description": "图表",
+      "type": "bar-chart",
+      "layout": {
+        "x": 742.2046472,
+        "y": 474.4722078,
+        "width": 400,
+        "height": 260,
+        "lockRatio": false
+      },
+      "props": {
+        "option": {
+          "legend": {
+            "top": 38,
+            "left": "center",
+            "itemWidth": 12,
+            "itemHeight": 8,
+            "show": true,
+            "textStyle": {
+              "color": "#cbd5e1"
+            }
+          },
+          "title": {
+            "text": "销售额统计",
+            "top": 8,
+            "left": "center",
+            "textStyle": {
+              "color": "#ffffff",
+              "fontSize": 16
+            }
+          },
+          "tooltip": {},
+          "dataset": {
+            "source": [
+              {
+                "month": "一月",
+                "sales": 120
+              },
+              {
+                "month": "二月",
+                "sales": 200
+              },
+              {
+                "month": "三月",
+                "sales": 150
+              },
+              {
+                "month": "四月",
+                "sales": 80
+              },
+              {
+                "month": "五月",
+                "sales": 170
+              },
+              {
+                "month": "六月",
+                "sales": 240
+              }
+            ]
+          },
+          "grid": {
+            "top": 86,
+            "right": 24,
+            "bottom": 32,
+            "left": 48,
+            "containLabel": true
+          },
+          "xAxis": {
+            "type": "category",
+            "axisLine": {
+              "lineStyle": {
+                "color": "#64748b"
+              }
+            },
+            "axisLabel": {
+              "color": "#cbd5e1"
+            }
+          },
+          "yAxis": {
+            "type": "value",
+            "axisLabel": {
+              "color": "#cbd5e1"
+            },
+            "splitLine": {
+              "lineStyle": {
+                "color": "rgba(148, 163, 184, 0.18)"
+              }
+            }
+          },
+          "series": [
+            {
+              "name": "销售额",
+              "type": "bar",
+              "barWidth": "45%",
+              "encode": {
+                "x": "month",
+                "y": "sales"
+              },
+              "itemStyle": {
+                "color": "#22d3ee",
+                "borderRadius": [
+                  4,
+                  4,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "dataSourceId": "5a177385-1edd-4be8-91ac-dc2421a24c28"
+    }
+  ],
+  "dataSources": [
+    {
+      "id": "542e84ad-46c0-491d-9ae0-0f1fee9cf5dd",
+      "name": "静态数据源",
+      "data": [
+        {
+          "month": "一月",
+          "sales": 10
+        },
+        {
+          "month": "二月",
+          "sales": 120
+        },
+        {
+          "month": "三月",
+          "sales": 200
+        },
+        {
+          "month": "四月",
+          "sales": 100
+        },
+        {
+          "month": "五月",
+          "sales": 150
+        },
+        {
+          "month": "六月",
+          "sales": 140
+        },
+        {
+          "month": "七月",
+          "sales": 180
+        }
+      ],
+      "type": "static"
+    },
+    {
+      "id": "f6156bf9-3de3-4b59-b6f1-53efdef358ee",
+      "name": "动态GET数据源",
+      "data": [],
+      "type": "api",
+      "url": "http://localhost:3000/api/mock/sales",
+      "method": "GET",
+      "params": {
+        "count": 12
+      },
+      "responsePath": "data.list"
+    },
+    {
+      "id": "5a177385-1edd-4be8-91ac-dc2421a24c28",
+      "name": "动态POST数据源",
+      "data": [],
+      "type": "api",
+      "url": "http://localhost:3000/api/mock/trend",
+      "method": "POST",
+      "params": {
+        "count": 8
+      },
+      "responsePath": "data.list"
+    },
+    {
+      "id": "39cf6b87-8ee6-4331-94e3-2674bc624146",
+      "name": "动态轮询数据源",
+      "data": [],
+      "type": "api",
+      "url": "http://localhost:3000/api/mock/data",
+      "method": "GET",
+      "interval": 2000,
+      "responsePath": "list"
+    }
+  ]
+}
