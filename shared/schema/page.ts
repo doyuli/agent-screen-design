@@ -15,16 +15,17 @@ const baseDataSourceSchema = z.object({
   data: z.unknown(),
 })
 
-const apiDataSourceSchema = baseDataSourceSchema.extend({
+export const apiDataSourceSchema = baseDataSourceSchema.extend({
   type: z.literal(dataSourceTypeSchema.enum.api),
   url: z.string(),
   method: z.enum(['GET', 'POST']),
-  headers: z.record(z.string(), z.unknown()).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
   params: z.record(z.string(), z.unknown()).optional(),
-  interval: z.number().int().positive().optional(),
+  interval: z.number().int().positive().optional().describe('milliseconds'),
+  responsePath: z.string().optional(),
 })
 
-const staticDataSourceSchema = baseDataSourceSchema.extend({
+export const staticDataSourceSchema = baseDataSourceSchema.extend({
   type: z.literal(dataSourceTypeSchema.enum.static),
 })
 
@@ -47,3 +48,5 @@ export type PageSchema = z.infer<typeof pageSchema>
 export type CanvasSchema = z.infer<typeof canvasSchema>
 export type DataSourceTypeSchema = z.infer<typeof dataSourceTypeSchema>
 export type DataSourceSchema = z.infer<typeof dataSourceSchema>
+export type ApiDataSourceSchema = z.infer<typeof apiDataSourceSchema>
+export type StaticDataSourceSchema = z.infer<typeof staticDataSourceSchema>

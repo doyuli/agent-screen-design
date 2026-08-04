@@ -31,6 +31,7 @@ export const materialSchema = z.object({
   layout: layoutSchema,
   style: z.record(z.string(), z.unknown()).optional(),
   props: z.record(z.string(), z.unknown()),
+  dataSourceId: z.string().optional(),
 })
 
 export const fieldTypeSchema = z.enum([

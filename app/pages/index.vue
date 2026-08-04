@@ -4,9 +4,10 @@ import LayerPanel from '@/components/designer/LayerPanel.vue'
 import MaterialPanel from '@/components/designer/MaterialPanel.vue'
 import PropertyPanel from '@/components/designer/PropertyPanel.vue'
 import Toolbar from '@/components/designer/Toolbar.vue'
+import { provideDataSource } from '@/composables/data-source'
 
 const editorStore = useEditorStore()
-const { panelCollapsed } = storeToRefs(editorStore)
+const { panelCollapsed, dataSources } = storeToRefs(editorStore)
 
 const layoutColumns = computed(() => {
   const { material, layer, property } = panelCollapsed.value
@@ -16,6 +17,10 @@ const layoutColumns = computed(() => {
     'minmax(0, 1fr)',
     property ? '0px' : '320px',
   ].join(' ')
+})
+
+provideDataSource({
+  dataSources,
 })
 </script>
 

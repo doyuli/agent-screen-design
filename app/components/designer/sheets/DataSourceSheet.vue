@@ -257,6 +257,11 @@ watch(open, (isOpen) => {
                 <Input id="data-source-interval" v-model.number="selectedDataSource.interval" type="number" min="0" placeholder="留空则不轮询" />
               </div>
 
+              <div class="space-y-2">
+                <Label for="data-source-response-path">响应路径</Label>
+                <Input id="data-source-response-path" v-model="selectedDataSource.responsePath" placeholder="data.list" />
+              </div>
+
               <div class="grid gap-4 lg:grid-cols-2">
                 <div class="space-y-2">
                   <Label for="data-source-headers">请求头</Label>

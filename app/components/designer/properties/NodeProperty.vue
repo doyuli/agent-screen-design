@@ -3,13 +3,13 @@ import { AlignCenter, Database, Paintbrush } from '@lucide/vue'
 import { FormBuilder } from '@/components/form'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Switch } from '@/components/ui/switch'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getMaterialFields } from '~/materials'
 import LayoutProperty from './LayoutProperty.vue'
 
 const editorStore = useEditorStore()
-const { selectedNode } = storeToRefs(editorStore)
+const { selectedNode, dataSources } = storeToRefs(editorStore)
 
 const styleFields = computed(() => getMaterialFields(selectedNode.value!.type))
 
@@ -42,9 +42,18 @@ const activeTab = ref('style')
       </TabsContent>
 
       <TabsContent value="data-base" class="m-0 space-y-5 p-4">
-        <div class="flex items-center justify-between rounded-md border bg-background px-3 py-2">
+        <div class="space-y-2">
           <Label for="data-source" class="text-sm">数据源</Label>
-          <Switch id="data-source" />
+          <Select v-model="selectedNode!.dataSourceId" clearable>
+            <SelectTrigger id="data-source" class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="dataSource in dataSources" :key="dataSource.id" :value="dataSource.id">
+                {{ dataSource.name }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </TabsContent>
     </ScrollArea>

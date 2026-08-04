@@ -2,6 +2,7 @@
 import type { EChartsOption, EChartsType } from 'echarts'
 import type { MaterialSchema } from '~~/shared/schema/material'
 import { init } from 'echarts'
+import { useDataSource } from '@/composables/data-source'
 
 defineOptions({
   name: 'ChartMaterial',
@@ -11,16 +12,30 @@ const props = defineProps<{
   schema: MaterialSchema
 }>()
 
-const chartRef = useTemplateRef('chartRef')
+const dataSourceId = computed(() => props.schema.dataSourceId)
+
+const { data: dataSourceData } = useDataSource(dataSourceId)
+
+const chartRef = useTemplateRef('chart-root')
 
 let chart: EChartsType
 
-const option = computed(() => props.schema.props.option || {})
+const option = computed(() => {
+  const opt = (props.schema.props.option ?? {}) as EChartsOption
+  const dataset = Array.isArray(opt.dataset) ? {} : (opt.dataset ?? {})
+  return {
+    ...opt,
+    dataset: {
+      ...dataset,
+      source: (dataSourceData.value as unknown[]) || dataset.source || [],
+    },
+  }
+})
 
 watch(
   option,
-  (newValue) => {
-    chart.setOption(newValue as EChartsOption)
+  (value) => {
+    chart.setOption(value as EChartsOption)
   },
   { deep: true },
 )
@@ -44,5 +59,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="chartRef" class="w-full h-full" />
+  <div ref="chart-root" class="w-full h-full" />
 </template>
