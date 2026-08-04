@@ -20,6 +20,7 @@ export const useEditorStore = defineStore('editor', () => {
       backgroundColor: '#07111f',
     },
     nodes: [],
+    dataSources: [],
   })
 
   const nodes = computed({
@@ -29,6 +30,10 @@ export const useEditorStore = defineStore('editor', () => {
   const canvas = computed({
     get: () => pageSchema.value.canvas,
     set: value => (pageSchema.value.canvas = value),
+  })
+  const dataSources = computed({
+    get: () => pageSchema.value.dataSources,
+    set: value => (pageSchema.value.dataSources = value),
   })
   const canvasScale = ref(1)
 
@@ -107,6 +112,7 @@ export const useEditorStore = defineStore('editor', () => {
     pageSchema,
     nodes,
     canvas,
+    dataSources,
     canvasScale,
     selectedNodeId,
     selectedNodeIds,

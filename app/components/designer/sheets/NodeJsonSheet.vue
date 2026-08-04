@@ -7,7 +7,7 @@ import { materialSchema } from '~~/shared/schema/material'
 import MonacoEditor from '@/components/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { safeJsonParse } from '~/utils'
+import { safeJsonParse, serializeJson } from '~/utils/parser'
 
 const props = defineProps<{
   node: MaterialSchema | undefined
@@ -29,18 +29,18 @@ watch(open, (isOpen) => {
   if (!isOpen)
     return
 
-  formattedNodeConfig.value = JSON.stringify(props.node, null, 2) || '{}'
+  formattedNodeConfig.value = serializeJson(props.node, '{}')
 })
 
 function saveNodeConfig() {
   const parsedConfig = safeJsonParse(formattedNodeConfig.value)
 
-  if (!parsedConfig) {
+  if (!parsedConfig.success) {
     toast.error('JSON 格式有误，请检查后重试')
     return
   }
 
-  const result = materialSchema.safeParse(parsedConfig)
+  const result = materialSchema.safeParse(parsedConfig.value)
 
   if (!result.success) {
     toast.error(result.error.issues[0]?.message ?? '节点配置不符合 Schema 要求')

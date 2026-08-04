@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Braces, Eye, FileInput, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
+import { Braces, Database, Eye, FileInput, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
 import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { pageSchema as pageSchemaType } from '~~/shared/schema/page'
@@ -9,7 +9,8 @@ import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useKeyboard } from '~/composables/keyboard'
 import { useUndoRedo } from '~/composables/undo-redo'
-import { safeJsonParse } from '~/utils'
+import { safeJsonParse, serializeJson } from '~/utils/parser'
+import DataSourceSheet from './sheets/DataSourceSheet.vue'
 import PageJsonSheet from './sheets/PageJsonSheet.vue'
 
 defineProps<{
@@ -25,13 +26,14 @@ defineEmits<{
 }>()
 
 const jsonOpen = ref(false)
+const dataSourceOpen = ref(false)
 
 const editorStore = useEditorStore()
 const { pageSchema, canvasScale, canvas } = storeToRefs(editorStore)
 
 const canvasScalePercentage = computed(() => Math.round(canvasScale.value * 100))
 
-const pageJson = computed(() => JSON.stringify(pageSchema.value, null, 2))
+const pageJson = computed(() => serializeJson(pageSchema.value))
 
 const { canUndo, canRedo, undo, redo } = useUndoRedo()
 const { registerShortcut } = useKeyboard()
@@ -72,12 +74,12 @@ async function handleFileChange(event: Event) {
 
   const parsedConfig = safeJsonParse(json)
 
-  if (!parsedConfig) {
+  if (!parsedConfig.success) {
     toast.error('JSON 格式有误，请检查后重试')
     return
   }
 
-  const result = pageSchemaType.safeParse(parsedConfig)
+  const result = pageSchemaType.safeParse(parsedConfig.value)
 
   if (!result.success) {
     toast.error(result.error.issues[0]?.message ?? '配置不符合 Schema 要求')
@@ -219,6 +221,16 @@ async function handleFileChange(event: Event) {
         <TooltipContent>查看页面 JSON</TooltipContent>
       </Tooltip>
 
+      <Tooltip>
+        <TooltipTrigger as-child>
+          <Button variant="ghost" size="icon-sm" @click="dataSourceOpen = true">
+            <Database class="size-4" aria-hidden="true" />
+            <span class="sr-only">编辑数据源</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>编辑数据源</TooltipContent>
+      </Tooltip>
+
       <Separator orientation="vertical" class="mx-0.5 hidden h-5 sm:block" />
       <Button variant="outline" size="sm" class="hidden sm:inline-flex">
         <Eye class="size-4" aria-hidden="true" />
@@ -239,5 +251,6 @@ async function handleFileChange(event: Event) {
     </div>
 
     <PageJsonSheet v-model:open="jsonOpen" :page-json="pageJson" />
+    <DataSourceSheet v-model:open="dataSourceOpen" />
   </header>
 </template>

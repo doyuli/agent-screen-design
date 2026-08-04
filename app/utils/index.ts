@@ -24,12 +24,3 @@ export function deepClone<T>(val: T) {
     return val
   return JSON.parse(JSON.stringify(val))
 }
-
-export function safeJsonParse(json: string) {
-  try {
-    return JSON.parse(json)
-  }
-  catch {
-    return null
-  }
-}

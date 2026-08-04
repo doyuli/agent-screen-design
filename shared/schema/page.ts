@@ -7,6 +7,32 @@ export const canvasSchema = z.object({
   backgroundColor: z.string(),
 })
 
+export const dataSourceTypeSchema = z.enum(['api', 'static'])
+
+const baseDataSourceSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  data: z.unknown(),
+})
+
+const apiDataSourceSchema = baseDataSourceSchema.extend({
+  type: z.literal(dataSourceTypeSchema.enum.api),
+  url: z.string(),
+  method: z.enum(['GET', 'POST']),
+  headers: z.record(z.string(), z.unknown()).optional(),
+  params: z.record(z.string(), z.unknown()).optional(),
+  interval: z.number().int().positive().optional(),
+})
+
+const staticDataSourceSchema = baseDataSourceSchema.extend({
+  type: z.literal(dataSourceTypeSchema.enum.static),
+})
+
+export const dataSourceSchema = z.discriminatedUnion('type', [
+  apiDataSourceSchema,
+  staticDataSourceSchema,
+])
+
 export const pageSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -14,7 +40,10 @@ export const pageSchema = z.object({
   type: z.literal('page'),
   canvas: canvasSchema,
   nodes: z.array(materialSchema),
+  dataSources: z.array(dataSourceSchema),
 })
 
 export type PageSchema = z.infer<typeof pageSchema>
 export type CanvasSchema = z.infer<typeof canvasSchema>
+export type DataSourceTypeSchema = z.infer<typeof dataSourceTypeSchema>
+export type DataSourceSchema = z.infer<typeof dataSourceSchema>
