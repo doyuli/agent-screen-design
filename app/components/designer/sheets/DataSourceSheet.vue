@@ -182,7 +182,6 @@ watch(open, (isOpen) => {
             <button
               v-for="source in draftDataSources"
               :key="source.id"
-              type="button"
               class="w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               :class="source.id === selectedDataSourceId && 'bg-accent text-accent-foreground'"
               @click="selectDataSource(source.id)"

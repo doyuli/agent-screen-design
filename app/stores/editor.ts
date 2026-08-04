@@ -36,6 +36,7 @@ export const useEditorStore = defineStore('editor', () => {
     set: value => (pageSchema.value.dataSources = value),
   })
   const canvasScale = ref(1)
+  const dataSourceSheetOpen = ref(false)
 
   const selectedNodeIds = ref<string[]>([])
   const selectedNodeId = computed(() => selectedNodeIds.value.length === 1 ? selectedNodeIds.value[0] : null)
@@ -45,6 +46,10 @@ export const useEditorStore = defineStore('editor', () => {
 
   function stepCanvasScale(step: number) {
     canvasScale.value += step
+  }
+
+  function openDataSourceSheet() {
+    dataSourceSheetOpen.value = true
   }
 
   function replaceNodes(value: MaterialSchema[]) {
@@ -114,6 +119,7 @@ export const useEditorStore = defineStore('editor', () => {
     canvas,
     dataSources,
     canvasScale,
+    dataSourceSheetOpen,
     selectedNodeId,
     selectedNodeIds,
     selectedNode,
@@ -129,6 +135,7 @@ export const useEditorStore = defineStore('editor', () => {
     clearSelectedNode,
     toggleNodeLock,
     stepCanvasScale,
+    openDataSourceSheet,
     setPageSchema,
   }
 })

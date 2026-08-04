@@ -26,10 +26,9 @@ defineEmits<{
 }>()
 
 const jsonOpen = ref(false)
-const dataSourceOpen = ref(false)
 
 const editorStore = useEditorStore()
-const { pageSchema, canvasScale, canvas } = storeToRefs(editorStore)
+const { pageSchema, canvasScale, canvas, dataSourceSheetOpen } = storeToRefs(editorStore)
 
 const canvasScalePercentage = computed(() => Math.round(canvasScale.value * 100))
 
@@ -223,7 +222,7 @@ async function handleFileChange(event: Event) {
 
       <Tooltip>
         <TooltipTrigger as-child>
-          <Button variant="ghost" size="icon-sm" @click="dataSourceOpen = true">
+          <Button variant="ghost" size="icon-sm" @click="editorStore.openDataSourceSheet()">
             <Database class="size-4" aria-hidden="true" />
             <span class="sr-only">编辑数据源</span>
           </Button>
@@ -251,6 +250,6 @@ async function handleFileChange(event: Event) {
     </div>
 
     <PageJsonSheet v-model:open="jsonOpen" :page-json="pageJson" />
-    <DataSourceSheet v-model:open="dataSourceOpen" />
+    <DataSourceSheet v-model:open="dataSourceSheetOpen" />
   </header>
 </template>

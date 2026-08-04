@@ -88,7 +88,6 @@ watch(open, (isOpen) => {
             <button
               v-for="event in events"
               :key="event.id"
-              type="button"
               class="w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               :class="event.id === selectedEventId && 'bg-accent text-accent-foreground'"
               @click="selectedEventId = event.id"
