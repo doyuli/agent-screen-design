@@ -59,7 +59,7 @@ function syncJsonValues() {
 
   for (const field of apiJsonFields) {
     const value = source[field.key]
-    apiJsonValues[field.key] = value === undefined ? '' : serializeJson(value)
+    apiJsonValues[field.key] = serializeJson(value, '')
   }
 }
 
@@ -185,7 +185,7 @@ function saveDataSources() {
 
 async function handleFetchData() {
   const source = selectedDataSource.value
-  if (source?.type === 'api') {
+  if (source?.type === 'api' && commitSelectedJson()) {
     const result = await fetchData(source)
     responseValue.value = serializeJson(result)
   }
