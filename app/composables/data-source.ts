@@ -9,6 +9,8 @@ interface DataSourceContext {
 
 const [injectDataSource, provideDataSource] = createContext<DataSourceContext>('dataSource')
 
+type RequestOverrides = Pick<ApiDataSourceSchema, 'headers' | 'params'>
+
 export function useDataSource(dataSourceId: Ref<string | undefined>) {
   const dataSources = injectDataSource().dataSources
 
@@ -22,7 +24,7 @@ export function useDataSource(dataSourceId: Ref<string | undefined>) {
   let requestVersion = 0
   let disposed = false
 
-  async function loadData() {
+  async function loadData(requestOverrides?: RequestOverrides) {
     clearTimer()
 
     const version = ++requestVersion
@@ -43,7 +45,7 @@ export function useDataSource(dataSourceId: Ref<string | undefined>) {
     }
     else if (currentSource.type === dataSourceTypeSchema.enum.api) {
       try {
-        const result = await fetchData(currentSource)
+        const result = await fetchData(currentSource, requestOverrides)
         if (isCurrentRequest(version))
           data.value = result
       }
@@ -74,7 +76,7 @@ export function useDataSource(dataSourceId: Ref<string | undefined>) {
     timer = undefined
   }
 
-  watch([dataSourceId, dataSources], loadData, { immediate: true })
+  watch([dataSourceId, dataSources], () => loadData(), { immediate: true })
 
   onBeforeUnmount(() => {
     disposed = true
@@ -92,10 +94,8 @@ export function useDataSource(dataSourceId: Ref<string | undefined>) {
 
 const FETCH_PROMISE_CACHE = new Map<string, Promise<unknown>>()
 
-export function fetchData(source: ApiDataSourceSchema) {
-  const { url, method, headers = {}, params = {} } = source
-
-  const fetchOptions = createFetchOptions(method, url, headers, params)
+export function fetchData(source: ApiDataSourceSchema, requestOverrides?: RequestOverrides) {
+  const fetchOptions = createFetchOptions(source, requestOverrides)
 
   const cacheKey = JSON.stringify({ fetchOptions, responsePath: source.responsePath })
 
@@ -127,27 +127,22 @@ export function fetchData(source: ApiDataSourceSchema) {
 }
 
 function createFetchOptions(
-  method: 'GET' | 'POST',
-  url: string,
-  headers: Record<string, string>,
-  params: Record<string, unknown>,
+  source: ApiDataSourceSchema,
+  requestOverrides?: RequestOverrides,
 ) {
+  const { url, method, headers = {}, params = {} } = source
+
+  const mergedHeaders = { ...headers, ...requestOverrides?.headers }
+  const mergedParams = { ...params, ...requestOverrides?.params }
+
   const baseHeaders = {
     'Content-Type': 'application/json',
-    ...headers,
-  }
-
-  const buildQueryUrl = (url: string, params: Record<string, unknown>) => {
-    const entries = Object.entries(params)
-    if (entries.length === 0)
-      return url
-
-    return `${url}?${new URLSearchParams(entries.map(([key, value]) => [key, String(value)]))}`
+    ...mergedHeaders,
   }
 
   if (method === 'GET') {
     return {
-      url: buildQueryUrl(url, params),
+      url: buildQueryUrl(url, mergedParams),
       options: {
         method,
         headers: baseHeaders,
@@ -160,9 +155,21 @@ function createFetchOptions(
     options: {
       method,
       headers: baseHeaders,
-      body: JSON.stringify(params),
+      body: JSON.stringify(mergedParams),
     },
   }
+}
+
+function buildQueryUrl(url: string, params: Record<string, unknown>) {
+  if (Object.keys(params).length === 0)
+    return url
+
+  const requestUrl = new URL(url)
+
+  for (const [key, value] of Object.entries(params))
+    requestUrl.searchParams.set(key, String(value))
+
+  return requestUrl.href
 }
 
 export {
