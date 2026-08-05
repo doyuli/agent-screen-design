@@ -8,5 +8,5 @@ import 'vue-sonner/style.css'
   <TooltipProvider>
     <NuxtPage />
   </TooltipProvider>
-  <Toaster />
+  <Toaster position="bottom-left" />
 </template>

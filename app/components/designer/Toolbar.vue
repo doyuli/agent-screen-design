@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { Braces, Database, Eye, FileInput, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
+import { Braces, Database, Eye, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
 import { computed, ref } from 'vue'
-import { toast } from 'vue-sonner'
-import { pageSchema as pageSchemaType } from '~~/shared/schema/page'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useKeyboard } from '~/composables/keyboard'
 import { useUndoRedo } from '~/composables/undo-redo'
-import { safeJsonParse, serializeJson } from '~/utils/parser'
 import DataSourceSheet from './sheets/DataSourceSheet.vue'
 import PageJsonSheet from './sheets/PageJsonSheet.vue'
 
@@ -32,8 +29,6 @@ const { pageSchema, canvasScale, canvas, dataSourceSheetOpen } = storeToRefs(edi
 
 const canvasScalePercentage = computed(() => Math.round(canvasScale.value * 100))
 
-const pageJson = computed(() => serializeJson(pageSchema.value))
-
 const { canUndo, canRedo, undo, redo } = useUndoRedo()
 const { registerShortcut } = useKeyboard()
 
@@ -49,44 +44,6 @@ registerShortcut([
     execute: () => redo(),
   },
 ])
-
-const fileInput = useTemplateRef<HTMLInputElement>('file-input')
-
-function importPageConfig() {
-  fileInput.value?.click()
-}
-
-async function handleFileChange(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-
-  if (!file)
-    return
-
-  let json: string
-  try {
-    json = await file.text()
-  }
-  catch {
-    toast.error('文件读取失败，请重试')
-    return
-  }
-
-  const parsedConfig = safeJsonParse(json)
-
-  if (!parsedConfig.success) {
-    toast.error('JSON 格式有误，请检查后重试')
-    return
-  }
-
-  const result = pageSchemaType.safeParse(parsedConfig.data)
-
-  if (!result.success) {
-    toast.error(result.error.issues[0]?.message ?? '配置不符合 Schema 要求')
-    return
-  }
-
-  editorStore.setPageSchema(result.data)
-}
 </script>
 
 <template>
@@ -201,23 +158,12 @@ async function handleFileChange(event: Event) {
     <div class="flex items-center gap-2">
       <Tooltip>
         <TooltipTrigger as-child>
-          <Button variant="ghost" size="icon-sm" @click="importPageConfig">
-            <FileInput class="size-4" aria-hidden="true" />
-            <span class="sr-only">导入配置</span>
-          </Button>
-          <input ref="file-input" class="hidden" type="file" accept="application/json" @change="handleFileChange">
-        </TooltipTrigger>
-        <TooltipContent>导入配置</TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger as-child>
           <Button variant="ghost" size="icon-sm" @click="jsonOpen = true">
             <Braces class="size-4" aria-hidden="true" />
-            <span class="sr-only">查看页面 JSON</span>
+            <span class="sr-only">编辑页面 JSON</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent>查看页面 JSON</TooltipContent>
+        <TooltipContent>编辑页面 JSON</TooltipContent>
       </Tooltip>
 
       <Tooltip>
@@ -249,7 +195,7 @@ async function handleFileChange(event: Event) {
       </Button>
     </div>
 
-    <PageJsonSheet v-model:open="jsonOpen" :page-json="pageJson" />
+    <PageJsonSheet v-model:open="jsonOpen" />
     <DataSourceSheet v-model:open="dataSourceSheetOpen" />
   </header>
 </template>
