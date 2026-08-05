@@ -2,14 +2,15 @@
 import type { DataSourceSchema } from '~~/shared/schema/page'
 import { Database, Plus, Save, Trash2 } from '@lucide/vue'
 import { toast } from 'vue-sonner'
-import { dataSourceSchema, dataSourceTypeSchema } from '~~/shared/schema/page'
+import { apiDataSourceSchema, dataSourceSchema, dataSourceTypeSchema, staticDataSourceSchema } from '~~/shared/schema/page'
 import MonacoEditor from '@/components/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { parseOptionalObjectJson, safeJsonParse, serializeJson } from '~/utils/parser'
+import { deepClone } from '~/utils'
+import { parseJsonWithSchema, safeJsonParse, serializeJson } from '~/utils/parser'
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -21,15 +22,41 @@ const selectedDataSourceId = ref<string | null>(null)
 const selectedDataSource = computed(() => draftDataSources.value.find(source => source.id === selectedDataSourceId.value))
 
 const dataValue = ref('[]')
-const headersValue = ref('')
-const paramsValue = ref('')
+const apiJsonFields = [
+  {
+    key: 'headers',
+    label: '请求头',
+    id: 'data-source-headers',
+    placeholder: '{"Authorization":"Bearer token"}',
+    schema: apiDataSourceSchema.shape.headers,
+  },
+  {
+    key: 'params',
+    label: '请求参数',
+    id: 'data-source-params',
+    placeholder: '{"page":1}',
+    schema: apiDataSourceSchema.shape.params,
+  },
+] as const
+
+type ApiJsonFieldKey = typeof apiJsonFields[number]['key']
+const apiJsonValues = reactive<Partial<Record<ApiJsonFieldKey, string>>>({})
 
 function syncJsonValues() {
   const source = selectedDataSource.value
 
-  dataValue.value = serializeJson(source?.data ?? [])
-  headersValue.value = source?.type === 'api' && source.headers ? serializeJson(source.headers) : ''
-  paramsValue.value = source?.type === 'api' && source.params ? serializeJson(source.params) : ''
+  dataValue.value = source?.type === 'static' ? serializeJson(source.data, '[]') : '[]'
+
+  for (const field of apiJsonFields)
+    apiJsonValues[field.key] = ''
+
+  if (source?.type !== 'api')
+    return
+
+  for (const field of apiJsonFields) {
+    const value = source[field.key]
+    apiJsonValues[field.key] = value === undefined ? '' : serializeJson(value)
+  }
 }
 
 function commitSelectedJson() {
@@ -37,34 +64,46 @@ function commitSelectedJson() {
   if (!source)
     return true
 
-  const data = safeJsonParse(dataValue.value)
-  if (!data.success) {
-    toast.error('数据内容不是有效的 JSON')
-    return false
-  }
+  if (source.type === 'static') {
+    const data = safeJsonParse(dataValue.value)
+    if (!data.success) {
+      toast.error('数据内容不是有效的 JSON')
+      return false
+    }
 
-  source.data = data.value
+    const result = staticDataSourceSchema.safeParse({ ...source, data: data.data })
+    if (!result.success) {
+      toast.error(result.error.issues[0]?.message ?? '静态数据源配置无效')
+      return false
+    }
 
-  if (source.type !== 'api')
+    Object.assign(source, result.data)
     return true
+  }
 
-  const headers = parseOptionalObjectJson(headersValue.value)
-  if (!headers.success) {
-    toast.error('请求头不是有效的 JSON')
+  const updates: Record<string, unknown> = {}
+
+  for (const field of apiJsonFields) {
+    const result = parseJsonWithSchema(apiJsonValues[field.key] ?? '', field.schema)
+    if (!result.success) {
+      toast.error(`${field.label}: ${result.error.issues[0]?.message ?? '格式不正确'}`)
+      return false
+    }
+
+    updates[field.key] = result.data
+  }
+
+  const result = apiDataSourceSchema.safeParse({
+    ...source,
+    ...updates,
+    interval: typeof source.interval === 'number' ? source.interval : undefined,
+  })
+  if (!result.success) {
+    toast.error(result.error.issues[0]?.message ?? 'API 数据源配置无效')
     return false
   }
-  source.headers = headers.value
 
-  const params = parseOptionalObjectJson(paramsValue.value)
-  if (!params.success) {
-    toast.error('请求参数不是有效的 JSON')
-    return false
-  }
-  source.params = params.value
-
-  if (typeof source.interval !== 'number')
-    source.interval = undefined
-
+  Object.assign(source, result.data)
   return true
 }
 
@@ -140,23 +179,11 @@ function saveDataSources() {
   open.value = false
 }
 
-function cloneDataSource(source: DataSourceSchema): DataSourceSchema {
-  if (source.type === 'api') {
-    return {
-      ...source,
-      headers: source.headers ? { ...source.headers } : undefined,
-      params: source.params ? { ...source.params } : undefined,
-    }
-  }
-
-  return { ...source }
-}
-
 watch(open, (isOpen) => {
   if (!isOpen)
     return
 
-  draftDataSources.value = dataSources.value.map(cloneDataSource)
+  draftDataSources.value = dataSources.value.map(deepClone)
   selectedDataSourceId.value = draftDataSources.value[0]?.id ?? null
   syncJsonValues()
 })
@@ -253,7 +280,7 @@ watch(open, (isOpen) => {
 
               <div class="space-y-2">
                 <Label for="data-source-interval">轮询间隔（毫秒）</Label>
-                <Input id="data-source-interval" v-model.number="selectedDataSource.interval" type="number" min="0" placeholder="留空则不轮询" />
+                <Input id="data-source-interval" v-model.number="selectedDataSource.interval" type="number" min="1" placeholder="留空则不轮询" />
               </div>
 
               <div class="space-y-2">
@@ -262,16 +289,14 @@ watch(open, (isOpen) => {
               </div>
 
               <div class="grid gap-4 lg:grid-cols-2">
-                <div class="space-y-2">
-                  <Label for="data-source-headers">请求头</Label>
-                  <div id="data-source-headers" class="h-40 overflow-hidden rounded-md border bg-background py-2">
-                    <MonacoEditor v-model="headersValue" placeholder="{'Authorization':'Bearer token'}" />
-                  </div>
-                </div>
-                <div class="space-y-2">
-                  <Label for="data-source-params">请求参数</Label>
-                  <div id="data-source-params" class="h-40 overflow-hidden rounded-md border bg-background py-2">
-                    <MonacoEditor v-model="paramsValue" placeholder="{'page':1}" />
+                <div v-for="field in apiJsonFields" :key="field.key" class="space-y-2">
+                  <Label :for="field.id">{{ field.label }}</Label>
+                  <div :id="field.id" class="h-40 overflow-hidden rounded-md border bg-background py-2">
+                    <MonacoEditor
+                      :model-value="apiJsonValues[field.key] ?? ''"
+                      :placeholder="field.placeholder"
+                      @update:model-value="apiJsonValues[field.key] = $event"
+                    />
                   </div>
                 </div>
               </div>

@@ -40,7 +40,7 @@ function saveNodeConfig() {
     return
   }
 
-  const result = materialSchema.safeParse(parsedConfig.value)
+  const result = materialSchema.safeParse(parsedConfig.data)
 
   if (!result.success) {
     toast.error(result.error.issues[0]?.message ?? '节点配置不符合 Schema 要求')

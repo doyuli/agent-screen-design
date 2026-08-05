@@ -78,7 +78,7 @@ async function handleFileChange(event: Event) {
     return
   }
 
-  const result = pageSchemaType.safeParse(parsedConfig.value)
+  const result = pageSchemaType.safeParse(parsedConfig.data)
 
   if (!result.success) {
     toast.error(result.error.issues[0]?.message ?? '配置不符合 Schema 要求')

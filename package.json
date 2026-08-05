@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "check": "pnpm lint && pnpm typecheck",
     "postinstall": "nuxt prepare && simple-git-hooks"
   },
   "dependencies": {
