@@ -322,7 +322,7 @@ watch(open, (isOpen) => {
               </div>
               <div v-if="responseValue" class="space-y-2">
                 <Label for="data-source-data">响应数据</Label>
-                <pre class="min-h-40 whitespace-pre-wrap wrap-break-word rounded-md border bg-background p-3 font-mono text-xs leading-5 text-foreground"><code>{{ responseValue }}</code></pre>
+                <pre class="min-h-40 whitespace-pre-wrap wrap-break-word rounded-md border bg-background p-2 font-mono text-xs leading-5 text-foreground"><code>{{ responseValue }}</code></pre>
               </div>
             </template>
 
