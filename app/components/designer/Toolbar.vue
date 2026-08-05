@@ -177,7 +177,7 @@ registerShortcut([
       </Tooltip>
 
       <Separator orientation="vertical" class="mx-0.5 hidden h-5 sm:block" />
-      <Button variant="outline" size="sm" class="hidden sm:inline-flex">
+      <Button variant="outline" size="sm" class="hidden sm:inline-flex" @click="navigateTo('/preview')">
         <Eye class="size-4" aria-hidden="true" />
         预览
       </Button>
