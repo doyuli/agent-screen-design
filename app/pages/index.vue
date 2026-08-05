@@ -9,6 +9,12 @@ import { provideDataSource } from '@/composables/data-source'
 const editorStore = useEditorStore()
 const { panelCollapsed, dataSources } = storeToRefs(editorStore)
 
+const route = useRoute()
+const id = route.query.id as string
+if (id) {
+  $fetch(`/api/screen/${id}`).then(schema => (schema && editorStore.setPageSchema(schema)))
+}
+
 const layoutColumns = computed(() => {
   const { material, layer, property } = panelCollapsed.value
   return [

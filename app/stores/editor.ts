@@ -112,6 +112,13 @@ export const useEditorStore = defineStore('editor', () => {
     clearSelectedNode()
   }
 
+  function updatePageSchema(schema: Partial<PageSchema>) {
+    pageSchema.value = {
+      ...pageSchema.value,
+      ...schema,
+    }
+  }
+
   return {
     panelCollapsed,
     pageSchema,
@@ -137,5 +144,6 @@ export const useEditorStore = defineStore('editor', () => {
     stepCanvasScale,
     openDataSourceSheet,
     setPageSchema,
+    updatePageSchema,
   }
 })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Braces, Database, Eye, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
 import { computed, ref } from 'vue'
+import { toast } from 'vue-sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -44,6 +45,32 @@ registerShortcut([
     execute: () => redo(),
   },
 ])
+
+function handlePreview() {
+  navigateTo('/preview')
+}
+
+async function handleSave() {
+  const result = await $fetch('/api/screen/publish', {
+    method: 'POST',
+    body: pageSchema.value,
+  })
+
+  if (!pageSchema.value.id)
+    editorStore.updatePageSchema({ id: result.id })
+
+  toast.success('保存成功')
+}
+
+async function handlePublish() {
+  const result = await $fetch('/api/screen/publish', {
+    method: 'POST',
+    body: pageSchema.value,
+  })
+
+  editorStore.updatePageSchema({ id: result.id })
+  navigateTo(`/screen?id=${result.id}`)
+}
 </script>
 
 <template>
@@ -177,19 +204,19 @@ registerShortcut([
       </Tooltip>
 
       <Separator orientation="vertical" class="mx-0.5 hidden h-5 sm:block" />
-      <Button variant="outline" size="sm" class="hidden sm:inline-flex" @click="navigateTo('/preview')">
+      <Button variant="outline" size="sm" class="hidden sm:inline-flex" @click="handlePreview">
         <Eye class="size-4" aria-hidden="true" />
         预览
       </Button>
-      <Button variant="outline" size="sm" class="hidden sm:inline-flex">
+      <Button variant="outline" size="sm" class="hidden sm:inline-flex" @click="handleSave">
         <Save class="size-4" aria-hidden="true" />
         保存
       </Button>
-      <Button variant="outline" size="icon-sm" class="sm:hidden">
+      <Button variant="outline" size="icon-sm" class="sm:hidden" @click="handlePreview">
         <Play class="size-4" aria-hidden="true" />
         <span class="sr-only">预览</span>
       </Button>
-      <Button size="sm">
+      <Button size="sm" @click="handlePublish">
         <Send class="size-4" aria-hidden="true" />
         发布
       </Button>
