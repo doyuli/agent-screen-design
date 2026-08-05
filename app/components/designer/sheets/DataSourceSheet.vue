@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DataSourceSchema } from '~~/shared/schema/page'
-import { Database, Plus, Save, Trash2 } from '@lucide/vue'
+import { Database, Plus, Save, Send, Trash2 } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { apiDataSourceSchema, dataSourceSchema, dataSourceTypeSchema, staticDataSourceSchema } from '~~/shared/schema/page'
 import MonacoEditor from '@/components/MonacoEditor.vue'
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { fetchData } from '~/composables/data-source'
 import { deepClone } from '~/utils'
 import { parseJsonWithSchema, safeJsonParse, serializeJson } from '~/utils/parser'
 
@@ -22,6 +23,8 @@ const selectedDataSourceId = ref<string | null>(null)
 const selectedDataSource = computed(() => draftDataSources.value.find(source => source.id === selectedDataSourceId.value))
 
 const dataValue = ref('[]')
+const responseValue = ref('')
+
 const apiJsonFields = [
   {
     key: 'headers',
@@ -46,6 +49,7 @@ function syncJsonValues() {
   const source = selectedDataSource.value
 
   dataValue.value = source?.type === 'static' ? serializeJson(source.data, '[]') : '[]'
+  responseValue.value = ''
 
   for (const field of apiJsonFields)
     apiJsonValues[field.key] = ''
@@ -179,6 +183,14 @@ function saveDataSources() {
   open.value = false
 }
 
+async function handleFetchData() {
+  const source = selectedDataSource.value
+  if (source?.type === 'api') {
+    const result = await fetchData(source)
+    responseValue.value = serializeJson(result)
+  }
+}
+
 watch(open, (isOpen) => {
   if (!isOpen)
     return
@@ -225,10 +237,17 @@ watch(open, (isOpen) => {
               <h3 class="text-sm font-semibold">
                 数据源详情
               </h3>
-              <Button variant="ghost" size="sm" class="text-destructive hover:text-destructive" @click="removeSelectedDataSource">
-                <Trash2 class="size-4" aria-hidden="true" />
-                删除
-              </Button>
+
+              <div class="flex items-center justify-end gap-2">
+                <Button v-if="selectedDataSource.type === 'api'" variant="ghost" size="sm" @click="handleFetchData">
+                  <Send class="size-4" aria-hidden="true" />
+                  请求预览
+                </Button>
+                <Button variant="ghost" size="sm" class="text-destructive hover:text-destructive" @click="removeSelectedDataSource">
+                  <Trash2 class="size-4" aria-hidden="true" />
+                  删除
+                </Button>
+              </div>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2">
@@ -300,6 +319,10 @@ watch(open, (isOpen) => {
                     />
                   </div>
                 </div>
+              </div>
+              <div v-if="responseValue" class="space-y-2">
+                <Label for="data-source-data">响应数据</Label>
+                <pre class="min-h-40 whitespace-pre-wrap wrap-break-word rounded-md border bg-background p-3 font-mono text-xs leading-5 text-foreground"><code>{{ responseValue }}</code></pre>
               </div>
             </template>
 
