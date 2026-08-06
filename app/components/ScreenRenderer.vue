@@ -4,14 +4,19 @@ import type { PageSchema } from '~~/shared/schema/page'
 import { useEventListener } from '@vueuse/core'
 import { provideDataSource } from '~/composables/data-source'
 import { getMaterialComponent } from '~/materials'
+import { createRuntimeContext } from '~/runtime/context'
+import { runSandbox } from '~/runtime/sandbox'
 
 const props = defineProps<{
   schema: PageSchema
 }>()
 
-const nodes = computed(() => props.schema.nodes)
-const canvas = computed(() => props.schema.canvas)
-const dataSources = computed(() => props.schema.dataSources)
+const runtimeSchema = toRef(props, 'schema')
+const runtimeContext = createRuntimeContext(runtimeSchema)
+
+const nodes = computed(() => runtimeSchema.value.nodes)
+const canvas = computed(() => runtimeSchema.value.canvas)
+const dataSources = computed(() => runtimeSchema.value.dataSources)
 
 const canvasLayoutState = reactive({
   scale: 0,
@@ -26,6 +31,42 @@ function initializeScale() {
   canvasLayoutState.scale = Math.min(scaleX, scaleY)
   canvasLayoutState.left = (window.innerWidth - canvas.value.width * canvasLayoutState.scale) / 2
   canvasLayoutState.top = (window.innerHeight - canvas.value.height * canvasLayoutState.scale) / 2
+}
+
+const instance = getCurrentInstance()
+
+function initializeRuntimeContext() {
+  if (!instance?.refs)
+    return
+
+  for (const key in instance.refs) {
+    const vm = instance.refs[key]
+    runtimeContext.registerInstance(key, Array.isArray(vm) ? vm[0] : vm)
+  }
+}
+
+function initializeEventListeners(node: MaterialSchema) {
+  const listeners: Record<string, (payload: unknown) => void> = {}
+
+  for (const event of node?.events ?? []) {
+    if (event.handler) {
+      listeners[event.type] = event.handler
+      continue
+    }
+
+    const listener = (payload: unknown) => {
+      runSandbox(event.code, {
+        $node: node,
+        $context: runtimeContext,
+        $payload: payload,
+      })
+    }
+
+    listeners[event.type] = listener
+    event.handler = listener
+  }
+
+  return listeners
 }
 
 const canvasStyle = computed(() => ({
@@ -48,6 +89,7 @@ function getNodeStyle(node: MaterialSchema, index: number) {
 
 onMounted(() => {
   initializeScale()
+  initializeRuntimeContext()
   useEventListener('resize', initializeScale)
 })
 
@@ -65,7 +107,12 @@ provideDataSource({
         class="absolute"
         :style="getNodeStyle(node, index)"
       >
-        <component :is="getMaterialComponent(node.type)" :schema="node" />
+        <component
+          :is="getMaterialComponent(node.type)"
+          :ref="node.id"
+          :schema="node"
+          v-on="initializeEventListeners(node)"
+        />
       </div>
     </div>
   </div>

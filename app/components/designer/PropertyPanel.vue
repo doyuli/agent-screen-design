@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MaterialSchema } from '~~/shared/schema/material'
+import type { MaterialEventSchema, MaterialSchema } from '~~/shared/schema/material'
 import { Braces, Zap } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,11 @@ function saveNodeJson(node: MaterialSchema) {
     editorStore.selectNodeById(node.id)
 
   toast.success('节点配置已保存')
+}
+
+function saveNodeEvents(events: MaterialEventSchema[]) {
+  if (selectedNode.value)
+    selectedNode.value.events = events
 }
 </script>
 
@@ -74,6 +79,6 @@ function saveNodeJson(node: MaterialSchema) {
     <NodeProperty v-else />
 
     <NodeJsonSheet v-model:open="nodeJsonOpen" :node="selectedNode" @save="saveNodeJson" />
-    <EventConfigSheet v-model:open="eventConfigOpen" />
+    <EventConfigSheet v-model:open="eventConfigOpen" :node="selectedNode" @save="saveNodeEvents" />
   </aside>
 </template>

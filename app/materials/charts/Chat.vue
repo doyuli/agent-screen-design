@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const dataSourceId = computed(() => props.schema.dataSourceId)
 
-const { data: dataSourceData } = useDataSource(dataSourceId)
+const { data: dataSourceData, refresh } = useDataSource(dataSourceId)
 
 const chartRef = useTemplateRef('chart-root')
 
@@ -55,6 +55,10 @@ onMounted(() => {
     observer.disconnect()
     chart.dispose()
   })
+})
+
+defineExpose({
+  refresh,
 })
 </script>
 
