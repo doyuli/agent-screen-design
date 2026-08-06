@@ -30,6 +30,22 @@ const { pageSchema, canvasScale, canvas, dataSourceSheetOpen } = storeToRefs(edi
 
 const canvasScalePercentage = computed(() => Math.round(canvasScale.value * 100))
 
+const { saveState, lastSavedAt, flushSave } = useScreenAutoSave()
+const saveStatusText = computed(() => {
+  switch (saveState.value) {
+    case 'dirty':
+      return '有未保存修改'
+    case 'saving':
+      return '正在保存'
+    case 'saved':
+      return `已保存 ${lastSavedAt.value?.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
+    case 'error':
+      return '保存失败'
+    default:
+      return '未保存'
+  }
+})
+
 const { canUndo, canRedo, undo, redo } = useUndoRedo()
 const { registerShortcut } = useKeyboard()
 
@@ -51,15 +67,11 @@ function handlePreview() {
 }
 
 async function handleSave() {
-  const result = await $fetch('/api/screen/publish', {
-    method: 'POST',
-    body: pageSchema.value,
-  })
-
-  if (!pageSchema.value.id)
-    editorStore.updatePageSchema({ id: result.id })
-
-  toast.success('保存成功')
+  const saved = await flushSave()
+  if (saved)
+    toast.success('保存成功')
+  else
+    toast.error('保存失败，请重试')
 }
 
 async function handlePublish() {
@@ -177,7 +189,7 @@ async function handlePublish() {
           {{ pageSchema.name }}
         </div>
         <div class="hidden text-xs text-muted-foreground sm:block">
-          {{ canvas.width }} x {{ canvas.height }} · 已自动保存
+          {{ canvas.width }} x {{ canvas.height }} · {{ saveStatusText }}
         </div>
       </div>
     </div>
