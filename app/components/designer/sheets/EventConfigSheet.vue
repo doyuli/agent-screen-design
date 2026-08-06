@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { registerMonacoRuntimeTypes } from '~/runtime/monaco'
 import { deepClone } from '~/utils'
 import EventCodeTools from './EventCodeTools.vue'
 
@@ -29,6 +30,8 @@ const selectedEvent = computed(() => draftEvents.value[selectedEventIndex.value]
 
 const eventTypes = materialEventTypeSchema.options
 const hasAvailableEventType = computed(() => eventTypes.some(type => !draftEvents.value.some(event => event.type === type)))
+
+registerMonacoRuntimeTypes()
 
 function addEvent() {
   const type = eventTypes.find(type => !draftEvents.value.some(event => event.type === type))
@@ -200,7 +203,7 @@ watch(open, (isOpen) => {
             <div class="space-y-2">
               <Label>事件函数体</Label>
               <EventCodeTools :node="node" :open="open" @insert="insertCodeAtCursor" />
-              <div class="overflow-hidden rounded-md border bg-background">
+              <div class="rounded-md border bg-background">
                 <div class="border-b bg-muted/50 px-3 py-2 font-mono text-sm text-muted-foreground">
                   function {{ selectedEvent.name }}($context, $node, $payload) {
                 </div>
@@ -209,7 +212,7 @@ watch(open, (isOpen) => {
                     ref="event-code-editor"
                     :model-value="selectedEvent.code"
                     language="javascript"
-                    :sticky-scroll="{ enabled: false }"
+                    :monaco-options="{ stickyScroll: { enabled: false } }"
                     @update:model-value="updateSelectedEvent('code', $event)"
                   />
                 </div>

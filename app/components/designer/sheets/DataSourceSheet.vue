@@ -313,8 +313,7 @@ watch(open, (isOpen) => {
                   <div :id="field.id" class="h-40 overflow-hidden rounded-md border bg-background py-2">
                     <MonacoEditor
                       :model-value="apiJsonValues[field.key] ?? ''"
-                      :placeholder="field.placeholder"
-                      :sticky-scroll="{ enabled: false }"
+                      :monaco-options="{ placeholder: field.placeholder, stickyScroll: { enabled: false } }"
                       @update:model-value="apiJsonValues[field.key] = $event"
                     />
                   </div>
@@ -329,7 +328,7 @@ watch(open, (isOpen) => {
             <div v-if="selectedDataSource.type === 'static'" class="space-y-2">
               <Label for="data-source-data">数据内容</Label>
               <div id="data-source-data" class="h-80 overflow-hidden rounded-md border bg-background py-2">
-                <MonacoEditor v-model="dataValue" :sticky-scroll="{ enabled: false }" />
+                <MonacoEditor v-model="dataValue" :monaco-options="{ stickyScroll: { enabled: false } }" />
               </div>
             </div>
           </div>

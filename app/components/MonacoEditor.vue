@@ -3,24 +3,14 @@ import type { HTMLAttributes } from 'vue'
 import { editor } from 'monaco-editor'
 import { cn } from '@/lib/utils'
 
-interface EditorProps extends Omit<editor.IStandaloneEditorConstructionOptions, 'value'> {
+interface EditorProps {
   class?: HTMLAttributes['class']
+  language?: string
+  monacoOptions?: editor.IStandaloneEditorConstructionOptions
 }
 
 const props = withDefaults(defineProps<EditorProps>(), {
   language: 'json',
-  automaticLayout: true,
-  lineNumbers: 'off',
-  scrollBeyondLastLine: false,
-  minimap: () => ({
-    enabled: false,
-  }),
-  overviewRulerLanes: 0,
-  hideCursorInOverviewRuler: true,
-  overviewRulerBorder: false,
-  scrollbar: () => ({
-    verticalScrollbarSize: 8,
-  }),
 })
 
 const editorRoot = useTemplateRef<HTMLElement>('editor-root')
@@ -29,14 +19,24 @@ let instance: editor.IStandaloneCodeEditor | null = null
 
 const modelValue = defineModel<string>('modelValue', { required: true })
 
+const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
+  lineNumbers: 'off',
+  scrollBeyondLastLine: false,
+  minimap: { enabled: false },
+  overviewRulerLanes: 0,
+  hideCursorInOverviewRuler: true,
+  overviewRulerBorder: false,
+  scrollbar: { verticalScrollbarSize: 8 },
+  automaticLayout: true,
+}
+
 onMounted(() => {
-  instance = editor.create(
-    editorRoot.value!,
-    {
-      value: modelValue.value,
-      ...props,
-    },
-  )
+  instance = editor.create(editorRoot.value!, {
+    ...defaultOptions,
+    ...props.monacoOptions,
+    language: props.language,
+    value: modelValue.value,
+  })
 
   instance.onDidChangeModelContent(() => {
     modelValue.value = instance?.getValue() ?? ''
