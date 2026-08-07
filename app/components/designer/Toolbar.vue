@@ -81,7 +81,7 @@ async function handlePublish() {
   })
 
   editorStore.updatePageSchema({ id: result.id })
-  navigateTo(`/screen?id=${result.id}`)
+  navigateTo(`/screen?id=${result.id}`, { open: { target: '_blank' } })
 }
 </script>
 
