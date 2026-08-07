@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import type { MaterialEventSchema, MaterialEventTypeSchema, MaterialSchema } from '~~/shared/schema/material'
+import type { MaterialEventSchema, MaterialSchema } from '~~/shared/schema/material'
 import { Plus, Save, Trash2 } from '@lucide/vue'
 import { toast } from 'vue-sonner'
-import { materialEventSchema, materialEventTypeSchema } from '~~/shared/schema/material'
+import { materialEventSchema } from '~~/shared/schema/material'
 import MonacoEditor from '@/components/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { getMaterialEvents } from '~/materials'
 import { registerMonacoRuntimeTypes } from '~/runtime/monaco'
 import { deepClone } from '~/utils'
 import EventCodeTools from './EventCodeTools.vue'
 
 const props = defineProps<{
-  node?: MaterialSchema
+  node: MaterialSchema
 }>()
 
 const emit = defineEmits<{
@@ -28,22 +29,22 @@ const selectedEventIndex = ref(0)
 const draftEvents = ref<MaterialEventSchema[]>([])
 const selectedEvent = computed(() => draftEvents.value[selectedEventIndex.value])
 
-const eventTypes = materialEventTypeSchema.options
-const hasAvailableEventType = computed(() => eventTypes.some(type => !draftEvents.value.some(event => event.type === type)))
+const eventTypes = computed(() => getMaterialEvents(props.node.type))
+const hasAvailableEventType = computed(() => eventTypes.value.some(eventType => !draftEvents.value.some(event => event.type === eventType.value)))
 
 registerMonacoRuntimeTypes()
 
 function addEvent() {
-  const type = eventTypes.find(type => !draftEvents.value.some(event => event.type === type))
-  if (!type) {
+  const eventType = eventTypes.value.find(eventType => !draftEvents.value.some(event => event.type === eventType.value))
+  if (!eventType) {
     toast.error('所有事件类型均已配置')
     return
   }
 
   const event: MaterialEventSchema = {
-    title: `${type}事件`,
-    type,
-    name: `on${type[0]!.toUpperCase()}${type.slice(1)}`,
+    title: `${eventType.label}事件`,
+    type: eventType.value,
+    name: `on${eventType.value[0]!.toUpperCase()}${eventType.value.slice(1)}`,
     code: '',
   }
 
@@ -59,26 +60,14 @@ function removeSelectedEvent() {
   selectedEventIndex.value = Math.min(selectedEventIndex.value, draftEvents.value.length - 1)
 }
 
-function updateSelectedEvent(key: 'title' | 'name' | 'code', value: string) {
-  if (!selectedEvent.value)
-    return
-
-  selectedEvent.value[key] = value
-}
-
-function updateSelectedEventType(type: unknown) {
-  const result = materialEventTypeSchema.safeParse(type)
-  if (!result.success || !selectedEvent.value || isEventTypeInUse(result.data))
-    return
-
-  selectedEvent.value.type = result.data
-}
-
-function isEventTypeInUse(type: MaterialEventTypeSchema) {
+function isEventTypeInUse(type: string) {
   return draftEvents.value.some((event, index) => index !== selectedEventIndex.value && event.type === type)
 }
 
 function insertCodeAtCursor(code: string) {
+  if (!selectedEvent.value)
+    return
+
   const instance = eventCodeEditor.value?.getInstance()
   const position = instance?.getPosition()
   if (!instance || !position)
@@ -94,7 +83,7 @@ function insertCodeAtCursor(code: string) {
     text: code,
     forceMoveMarkers: true,
   }])
-  updateSelectedEvent('code', instance.getValue())
+  selectedEvent.value.code = instance.getValue()
   instance.focus()
 }
 
@@ -129,7 +118,7 @@ watch(open, (isOpen) => {
   if (!isOpen)
     return
 
-  draftEvents.value = props.node?.events?.map(deepClone) ?? []
+  draftEvents.value = props.node.events?.map(deepClone) ?? []
   selectedEventIndex.value = 0
 })
 </script>
@@ -178,23 +167,23 @@ watch(open, (isOpen) => {
 
             <div class="space-y-2">
               <Label for="event-name">事件名称</Label>
-              <Input id="event-name" :model-value="selectedEvent.title" @update:model-value="updateSelectedEvent('title', String($event))" />
+              <Input id="event-name" v-model="selectedEvent.title" />
             </div>
 
             <div class="space-y-2">
               <Label for="event-function-name">函数名称</Label>
-              <Input id="event-function-name" :model-value="selectedEvent.name" @update:model-value="updateSelectedEvent('name', String($event))" />
+              <Input id="event-function-name" v-model="selectedEvent.name" />
             </div>
 
             <div class="space-y-2">
               <Label for="event-type">事件类型</Label>
-              <Select :model-value="selectedEvent.type" @update:model-value="updateSelectedEventType">
+              <Select v-model="selectedEvent.type">
                 <SelectTrigger id="event-type" class="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem v-for="eventType in eventTypes" :key="eventType" :value="eventType" :disabled="isEventTypeInUse(eventType)">
-                    {{ eventType }}
+                  <SelectItem v-for="eventType in eventTypes" :key="eventType.value" :value="eventType.value" :disabled="isEventTypeInUse(eventType.value)">
+                    {{ eventType.label }}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -210,10 +199,9 @@ watch(open, (isOpen) => {
                 <div class="h-72 py-2">
                   <MonacoEditor
                     ref="event-code-editor"
-                    :model-value="selectedEvent.code"
+                    v-model="selectedEvent.code"
                     language="javascript"
                     :monaco-options="{ stickyScroll: { enabled: false } }"
-                    @update:model-value="updateSelectedEvent('code', $event)"
                   />
                 </div>
                 <div class="border-t bg-muted/50 px-3 py-2 font-mono text-sm text-muted-foreground">

@@ -22,11 +22,9 @@ export const materialGroupSchema = z.enum([
   'charts',
 ])
 
-export const materialEventTypeSchema = z.enum(['click'])
-
 export const materialEventSchema = z.object({
   title: z.string(),
-  type: materialEventTypeSchema,
+  type: z.string(),
   name: z.string().describe('function name'),
   code: z.string(),
   handler: z.function({
@@ -66,12 +64,18 @@ export const fieldSchema = z.object({
   props: z.record(z.string(), z.unknown()).optional(),
 })
 
+export const eventDefinitionSchema = z.object({
+  label: z.string(),
+  value: z.string(),
+})
+
 export const materialDefinitionSchema = z.object({
   name: z.string(),
   group: materialGroupSchema,
   icon: z.custom<Component>(),
   schema: materialSchema.omit({ id: true }),
   fields: z.array(fieldSchema),
+  events: z.array(eventDefinitionSchema).optional(),
 })
 
 export type FieldSchema = z.infer<typeof fieldSchema>
@@ -80,5 +84,5 @@ export type MaterialTypeSchema = z.infer<typeof materialTypeSchema>
 export type MaterialGroupSchema = z.infer<typeof materialGroupSchema>
 export type MaterialSchema = z.infer<typeof materialSchema>
 export type MaterialDefinitionSchema = z.infer<typeof materialDefinitionSchema>
-export type MaterialEventTypeSchema = z.infer<typeof materialEventTypeSchema>
 export type MaterialEventSchema = z.infer<typeof materialEventSchema>
+export type EventDefinitionSchema = z.infer<typeof eventDefinitionSchema>

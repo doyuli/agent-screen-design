@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import type { MaterialDefinitionSchema, MaterialGroupSchema, MaterialSchema, MaterialTypeSchema } from '~~/shared/schema/material'
+import type { EventDefinitionSchema, MaterialDefinitionSchema, MaterialGroupSchema, MaterialSchema, MaterialTypeSchema } from '~~/shared/schema/material'
 
 const materials: MaterialDefinitionSchema[] = []
 const componentMap = new Map<MaterialTypeSchema, Component>()
@@ -33,6 +33,25 @@ const MATERIAL_GROUPS: { key: MaterialGroupSchema, name: string }[] = [
   },
 ]
 
+const COMMON_EVENT_DEFINITIONS: EventDefinitionSchema[] = [
+  {
+    label: '点击',
+    value: 'click',
+  },
+  {
+    label: '双击',
+    value: 'dblclick',
+  },
+  {
+    label: '组件挂载',
+    value: 'vnodeMounted',
+  },
+  {
+    label: '组件卸载',
+    value: 'vnodeUnmounted',
+  },
+]
+
 export function getAllMaterials() {
   return [...materials]
 }
@@ -58,4 +77,12 @@ export function createMaterialNode(node: MaterialDefinitionSchema['schema']): Ma
     ...node,
     id: crypto.randomUUID(),
   }
+}
+
+export function getMaterialEvents(type: MaterialTypeSchema) {
+  const events = materialMap.get(type)?.events || []
+  return [
+    ...COMMON_EVENT_DEFINITIONS,
+    ...events,
+  ]
 }

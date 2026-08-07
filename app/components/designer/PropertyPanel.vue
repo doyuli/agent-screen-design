@@ -78,7 +78,7 @@ function saveNodeEvents(events: MaterialEventSchema[]) {
     <CanvasProperty v-if="currentNode.type === 'page'" />
     <NodeProperty v-else />
 
-    <NodeJsonSheet v-model:open="nodeJsonOpen" :node="selectedNode" @save="saveNodeJson" />
-    <EventConfigSheet v-model:open="eventConfigOpen" :node="selectedNode" @save="saveNodeEvents" />
+    <NodeJsonSheet v-model:open="nodeJsonOpen" :node="selectedNode!" @save="saveNodeJson" />
+    <EventConfigSheet v-model:open="eventConfigOpen" :node="selectedNode!" @save="saveNodeEvents" />
   </aside>
 </template>

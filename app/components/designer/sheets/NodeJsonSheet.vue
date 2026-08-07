@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { safeJsonParse, serializeJson } from '~/utils/parser'
 
 const props = defineProps<{
-  node: MaterialSchema | undefined
+  node: MaterialSchema
 }>()
 
 const emit = defineEmits<{
