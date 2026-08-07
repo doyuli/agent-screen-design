@@ -12,6 +12,11 @@ const props = defineProps<{
   schema: MaterialSchema
 }>()
 
+const emit = defineEmits<{
+  click: [payload: unknown]
+  legendselectchanged: [payload: unknown]
+}>()
+
 const dataSourceId = computed(() => props.schema.dataSourceId)
 
 const { data: dataSourceData, refresh } = useDataSource(dataSourceId)
@@ -44,6 +49,8 @@ onMounted(() => {
   chart = init(chartRef.value)
 
   chart.setOption(option.value as EChartsOption)
+  chart.on('click', params => emit('click', params))
+  chart.on('legendselectchanged', params => emit('legendselectchanged', params))
 
   const observer = new ResizeObserver(() => {
     chart.resize()

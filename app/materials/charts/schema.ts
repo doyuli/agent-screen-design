@@ -1,6 +1,13 @@
 import type { MaterialDefinitionSchema } from '~~/shared/schema/material'
 import { AreaChartIcon, BarChartIcon, LineChartIcon, PieChartIcon } from '@lucide/vue'
 
+const chartEvents = [
+  {
+    label: '图例切换',
+    value: 'legendselectchanged',
+  },
+]
+
 export const areaChartMaterialSchema: MaterialDefinitionSchema = {
   name: '面积图',
   group: 'charts',
@@ -193,6 +200,7 @@ export const areaChartMaterialSchema: MaterialDefinitionSchema = {
       span: 12,
     },
   ],
+  events: chartEvents,
 }
 
 export const barChartMaterialSchema: MaterialDefinitionSchema = {
@@ -369,6 +377,7 @@ export const barChartMaterialSchema: MaterialDefinitionSchema = {
       span: 12,
     },
   ],
+  events: chartEvents,
 }
 
 export const lineChartMaterialSchema: MaterialDefinitionSchema = {
@@ -553,6 +562,7 @@ export const lineChartMaterialSchema: MaterialDefinitionSchema = {
       span: 12,
     },
   ],
+  events: chartEvents,
 }
 
 export const pieChartMaterialSchema: MaterialDefinitionSchema = {
@@ -677,4 +687,5 @@ export const pieChartMaterialSchema: MaterialDefinitionSchema = {
       span: 12,
     },
   ],
+  events: chartEvents,
 }
