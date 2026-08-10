@@ -3,6 +3,7 @@ import type { EChartsOption, EChartsType } from 'echarts'
 import type { MaterialSchema } from '~~/shared/schema/material'
 import { init } from 'echarts'
 import { useDataSource } from '@/composables/data-source'
+import { ensureArray, ensureRecord } from '../_shared/data'
 
 defineOptions({
   name: 'ChartMaterial',
@@ -27,12 +28,12 @@ let chart: EChartsType
 
 const option = computed(() => {
   const opt = (props.schema.props.option ?? {}) as EChartsOption
-  const dataset = Array.isArray(opt.dataset) ? {} : (opt.dataset ?? {})
+  const dataset = ensureRecord(opt.dataset)
   return {
     ...opt,
     dataset: {
       ...dataset,
-      source: (dataSourceData.value as unknown[]) || dataset.source || [],
+      source: ensureArray(dataSourceData.value, dataset.source as unknown[] || []),
     },
   }
 })

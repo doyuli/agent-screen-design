@@ -31,6 +31,18 @@ const MATERIAL_GROUPS: { key: MaterialGroupSchema, name: string }[] = [
     name: '图表',
     key: 'charts',
   },
+  {
+    name: '媒体',
+    key: 'media',
+  },
+  {
+    name: '装饰',
+    key: 'decorations',
+  },
+  {
+    name: '表格',
+    key: 'tables',
+  },
 ]
 
 const COMMON_EVENT_DEFINITIONS: EventDefinitionSchema[] = [

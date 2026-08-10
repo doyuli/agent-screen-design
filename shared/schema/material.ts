@@ -11,15 +11,27 @@ export const layoutSchema = z.object({
 
 export const materialTypeSchema = z.enum([
   'text',
+  'image',
+  'number-flip',
+  'metric-card',
+  'border-box',
+  'scroll-list',
   'area-chart',
   'bar-chart',
   'line-chart',
   'pie-chart',
+  'gauge-chart',
+  'donut-chart',
+  'rose-chart',
+  'horizontal-bar-chart',
 ])
 
 export const materialGroupSchema = z.enum([
   'basics',
   'charts',
+  'media',
+  'decorations',
+  'tables',
 ])
 
 export const materialEventSchema = z.object({
@@ -54,6 +66,7 @@ export const fieldTypeSchema = z.enum([
   'checkbox',
   'color',
   'separator',
+  'json',
 ])
 
 export const fieldSchema = z.object({

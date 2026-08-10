@@ -2,6 +2,7 @@
 import type { MaterialSchema } from '~~/shared/schema/material'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useDataSource } from '@/composables/data-source'
+import { ensureArray } from '../_shared/data'
 
 interface ColumnDef {
   key: string
@@ -14,23 +15,14 @@ const props = defineProps<{
   schema: MaterialSchema
 }>()
 
-const columns = computed<ColumnDef[]>(() => {
-  const value = props.schema.props?.columns
-  return Array.isArray(value) ? value : []
-})
+const columns = computed<ColumnDef[]>(() => ensureArray(props.schema.props?.columns, []))
 
-const fallbackRows = computed<Record<string, unknown>[]>(() => {
-  const value = props.schema.props?.rows
-  return Array.isArray(value) ? value : []
-})
+const fallbackRows = computed<Record<string, unknown>[]>(() => ensureArray(props.schema.props?.rows, []))
 
 const dataSourceId = computed(() => props.schema.dataSourceId)
 const { data: dataSourceData } = useDataSource(dataSourceId)
 
-const rows = computed<Record<string, unknown>[]>(() => {
-  const data = dataSourceData.value
-  return Array.isArray(data) ? data : fallbackRows.value
-})
+const rows = computed<Record<string, unknown>[]>(() => ensureArray(dataSourceData.value, fallbackRows.value))
 
 const rowHeight = computed(() => Math.max(24, Number(props.schema.props?.rowHeight ?? 40)))
 const duration = computed(() => Math.max(1, Number(props.schema.props?.duration ?? 15)))
