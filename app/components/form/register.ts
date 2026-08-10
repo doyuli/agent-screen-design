@@ -5,6 +5,7 @@ import { ColorPicker } from '@/components/ui/color'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
+import FormJson from './components/FormJson.vue'
 import FormSelect from './components/FormSelect.vue'
 
 const COMPONENT_MAP = new Map<string, Component>([
@@ -15,6 +16,7 @@ const COMPONENT_MAP = new Map<string, Component>([
   ['select', FormSelect],
   ['checkbox', Checkbox],
   ['separator', Separator],
+  ['json', FormJson],
 ])
 
 export function register(name: string, component: Component) {

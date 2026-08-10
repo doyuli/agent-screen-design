@@ -10,6 +10,9 @@ export function serializeJson(value: unknown, fallback: string = 'null') {
 }
 
 export function safeJsonParse(value: string) {
+  if (!value.trim())
+    return { success: true as const, data: undefined, error: undefined }
+
   try {
     return { success: true as const, data: JSON.parse(value), error: undefined }
   }
@@ -20,10 +23,6 @@ export function safeJsonParse(value: string) {
 }
 
 export function parseJsonWithSchema(value: string, schema: z.ZodType) {
-  if (!value.trim()) {
-    return schema.safeParse(undefined)
-  }
-
   const parsed = safeJsonParse(value)
   if (!parsed.success)
     return parsed

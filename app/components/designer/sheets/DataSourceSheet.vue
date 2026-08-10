@@ -69,7 +69,13 @@ function commitSelectedJson() {
     return true
 
   if (source.type === 'static') {
-    const data = safeJsonParse(dataValue.value)
+    const cleanedValue = dataValue.value.trim()
+    if (!cleanedValue) {
+      toast.error('数据内容不能为空')
+      return false
+    }
+
+    const data = safeJsonParse(cleanedValue)
     if (!data.success) {
       toast.error('数据内容不是有效的 JSON')
       return false
