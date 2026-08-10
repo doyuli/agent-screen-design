@@ -12,6 +12,7 @@ export const TextMaterial = defineComponent({
       return {
         ...s,
         fontSize: `${s.fontSize ?? 16}px`,
+        letterSpacing: `${s.letterSpacing ?? 0}px`,
       }
     })
     return () => h('div', { style: style.value }, String(props.schema.props?.content ?? ''))
