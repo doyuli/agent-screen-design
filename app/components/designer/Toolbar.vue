@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Braces, Database, Eye, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
+import { AlignCenterHorizontal, Braces, Database, Eye, Layers3, PanelLeft, PanelRight, Play, Redo2, Save, Send, Undo2, ZoomIn, ZoomOut } from '@lucide/vue'
 import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { controlActions, distributionActions, useAlignment } from '~/composables/alignment'
 import { useKeyboard } from '~/composables/keyboard'
 import { useUndoRedo } from '~/composables/undo-redo'
 import DataSourceSheet from './sheets/DataSourceSheet.vue'
@@ -47,6 +49,7 @@ const saveStatusText = computed(() => {
 })
 
 const { canUndo, canRedo, undo, redo } = useUndoRedo()
+const { align, canAlign, canDistribute } = useAlignment()
 const { registerShortcut } = useKeyboard()
 
 registerShortcut([
@@ -158,6 +161,57 @@ async function handlePublish() {
             </Button>
           </TooltipTrigger>
           <TooltipContent>重做</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <DropdownMenu>
+            <TooltipTrigger as-child>
+              <DropdownMenuTrigger as-child>
+                <Button variant="ghost" size="icon-sm" :disabled="!canAlign">
+                  <AlignCenterHorizontal class="size-4" aria-hidden="true" />
+                  <span class="sr-only">对齐</span>
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <DropdownMenuContent class="w-auto p-1" align="start">
+              <div class="grid grid-cols-3 gap-1">
+                <Tooltip v-for="item in controlActions" :key="item.action">
+                  <TooltipTrigger as-child>
+                    <DropdownMenuItem
+                      :aria-label="item.label"
+                      class="size-8 cursor-pointer justify-center p-0"
+                      @select="align(item.action)"
+                    >
+                      <component :is="item.icon" class="size-4" aria-hidden="true" />
+                      <span class="sr-only">{{ item.label }}</span>
+                    </DropdownMenuItem>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    {{ item.label }}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <DropdownMenuSeparator class="my-1" />
+              <div class="grid grid-cols-3 gap-1">
+                <Tooltip v-for="item in distributionActions" :key="item.action">
+                  <TooltipTrigger as-child>
+                    <DropdownMenuItem
+                      :aria-label="item.label"
+                      :disabled="!canDistribute"
+                      class="size-8 cursor-pointer justify-center p-0"
+                      @select="align(item.action)"
+                    >
+                      <component :is="item.icon" class="size-4" aria-hidden="true" />
+                      <span class="sr-only">{{ item.label }}</span>
+                    </DropdownMenuItem>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    {{ item.label }}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <TooltipContent>对齐</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>

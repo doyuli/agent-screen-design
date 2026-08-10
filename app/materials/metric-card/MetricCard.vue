@@ -2,8 +2,8 @@
 import type { MaterialSchema } from '~~/shared/schema/material'
 import { TrendingDownIcon, TrendingUpIcon } from '@lucide/vue'
 import { useDataSource } from '@/composables/data-source'
-import { formatCountUpValue, useCountUp } from '../_shared/count-up'
-import { ensureNumber, ensureRecord } from '../_shared/data'
+import { formatCountUpValue, useCountUp } from '../shared/count-up'
+import { ensureNumber, ensureRecord } from '../shared/data'
 
 const props = defineProps<{
   schema: MaterialSchema

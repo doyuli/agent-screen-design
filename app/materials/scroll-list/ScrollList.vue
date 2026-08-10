@@ -2,7 +2,7 @@
 import type { MaterialSchema } from '~~/shared/schema/material'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useDataSource } from '@/composables/data-source'
-import { ensureArray } from '../_shared/data'
+import { ensureArray } from '../shared/data'
 
 interface ColumnDef {
   key: string

@@ -3,7 +3,7 @@ import type { EChartsOption, EChartsType } from 'echarts'
 import type { MaterialSchema } from '~~/shared/schema/material'
 import { init } from 'echarts'
 import { useDataSource } from '@/composables/data-source'
-import { ensureArray, ensureRecord } from '../_shared/data'
+import { ensureArray, ensureRecord } from '../shared/data'
 
 defineOptions({
   name: 'ChartMaterial',
